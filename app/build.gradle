@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
+
 
 android {
     def app = rootProject.ext.android
@@ -15,8 +16,9 @@ android {
         versionName app.versionName
         resConfigs app.resConfigs
 
-        buildConfigField "String", "$rootProject.ext.weather.name", "\"$rootProject.ext.weather.value\""
-        buildConfigField "String", "$rootProject.ext.fir.name", "\"$rootProject.ext.fir.value\""
+//        buildConfigField "String", "$rootProject.ext.weather.name", "\"$rootProject.ext.weather.value\""
+//        buildConfigField "String", "$rootProject.ext.fir.name", "\"$rootProject.ext.fir.value\""
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -48,6 +50,7 @@ android {
 
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
+    buildToolsVersion '26.0.2'
 }
 
 dependencies {
@@ -60,7 +63,7 @@ dependencies {
     // Rx
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4'
+//    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4'
     compile 'com.trello.rxlifecycle2:rxlifecycle:2.0.1'
     compile 'com.trello.rxlifecycle2:rxlifecycle-android:2.0.1'
     compile 'com.trello.rxlifecycle2:rxlifecycle-components:2.0.1'
@@ -70,7 +73,12 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
+//    compile 'com.github.VictorAlbertos.RxCache:core:1.4.6'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+
+    //爬虫
+    compile 'org.jsoup:jsoup:1.11.2'
+
 
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
@@ -81,7 +89,7 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
 
-    compile 'com.github.xcc3641:watcher:1.0'
+//    compile 'com.github.xcc3641:watcher:1.0'
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 

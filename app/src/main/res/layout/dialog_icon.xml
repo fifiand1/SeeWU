@@ -30,7 +30,7 @@
                 android:id="@+id/type_one"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:src="@mipmap/type_one_sunny"/>
+                android:src="@mipmap/none"/>
             <RadioButton
                 android:id="@+id/radio_one"
                 android:layout_width="wrap_content"
@@ -53,7 +53,7 @@
                 android:id="@+id/type_two"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:src="@mipmap/type_two_sunny"/>
+                android:src="@mipmap/none"/>
             <RadioButton
                 android:id="@+id/radio_two"
                 android:layout_width="wrap_content"

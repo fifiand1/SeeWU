@@ -6,19 +6,19 @@ ext {
         minSdkVersion    : 19,
         compileSdkVersion: 26,
         targetSdkVersion : 25,
-        applicationId    : "com.xiecc.seeWeather",
+        applicationId    : "com.wzf.wucarryme",
         versionCode      : 34,
         versionName      : "2.3.1",
         resConfigs       : "zh",
     ]
-
-    weather = [
-        name : "WeatherKey",
-        value: "282f3846df6b41178e4a2218ae083ea7"
-    ]
-
-    fir = [
-        name : "FirToken",
-        value: "7db041d0c3013b63e4bed2a554f02d85"
-    ]
+//
+//    weather = [
+//        name : "WeatherKey",
+//        value: "282f3846df6b41178e4a2218ae083ea7"
+//    ]
+//
+//    fir = [
+//        name : "FirToken",
+//        value: "7db041d0c3013b63e4bed2a554f02d85"
+//    ]
 }
