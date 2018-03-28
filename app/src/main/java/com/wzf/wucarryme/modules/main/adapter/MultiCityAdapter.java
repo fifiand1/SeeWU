@@ -19,19 +19,19 @@ import com.wzf.wucarryme.base.BaseViewHolder;
 import com.wzf.wucarryme.component.PLog;
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
 import com.wzf.wucarryme.common.utils.Util;
-import com.wzf.wucarryme.modules.main.domain.Weather;
+import com.wzf.wucarryme.modules.main.domain.StockResp;
 import java.util.List;
 
 public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.MultiCityViewHolder> {
     private Context mContext;
-    private List<Weather> mWeatherList;
+    private List<StockResp.DataBean> mWeatherList;
     private onMultiCityClick mMultiCityClick;
 
     public void setMultiCityClick(onMultiCityClick multiCityClick) {
         this.mMultiCityClick = multiCityClick;
     }
 
-    public MultiCityAdapter(List<Weather> weatherList) {
+    public MultiCityAdapter(List<StockResp.DataBean> weatherList) {
         mWeatherList = weatherList;
     }
 
@@ -46,7 +46,7 @@ public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.Mult
 
         holder.bind(mWeatherList.get(position));
         holder.itemView.setOnLongClickListener(v -> {
-            mMultiCityClick.longClick(mWeatherList.get(holder.getAdapterPosition()).basic.city);
+            mMultiCityClick.longClick(mWeatherList.get(holder.getAdapterPosition()));
             return true;
         });
         holder.itemView.setOnClickListener(v -> mMultiCityClick.click(mWeatherList.get(holder.getAdapterPosition())));
@@ -61,7 +61,7 @@ public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.Mult
         return 0 == mWeatherList.size();
     }
 
-    class MultiCityViewHolder extends BaseViewHolder<Weather> {
+    class MultiCityViewHolder extends BaseViewHolder<StockResp.DataBean> {
 
         @BindView(R.id.dialog_city)
         TextView mDialogCity;
@@ -77,17 +77,17 @@ public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.Mult
         }
 
         @Override
-        protected void bind(Weather weather) {
+        protected void bind(StockResp.DataBean stock) {
 
             try {
-                mDialogCity.setText(Util.safeText(weather.basic.city));
-                mDialogTemp.setText(String.format("%s℃", weather.now.tmp));
+                mDialogCity.setText(Util.safeText(stock.getStockName()));
+                mDialogTemp.setText(stock.getFormattedPrice());
             } catch (NullPointerException e) {
                 PLog.e(e.getMessage());
             }
 
             Glide.with(mContext)
-                .load(SharedPreferenceUtil.getInstance().getInt(weather.now.cond.txt, R.mipmap.none))
+                .load(SharedPreferenceUtil.getInstance().getInt("none", R.mipmap.none))
                 .asBitmap()
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
@@ -97,14 +97,14 @@ public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.Mult
                     }
                 });
 
-            int code = Integer.valueOf(weather.now.cond.code);
-            new CardCityHelper().applyStatus(code, weather.basic.city, mCardView);
+//            int code = Integer.valueOf(stock.now.cond.code);
+//            new CardCityHelper().applyStatus(code, stock.basic.city, mCardView);
         }
     }
 
     public interface onMultiCityClick {
-        void longClick(String city);
+        void longClick(StockResp.DataBean city);
 
-        void click(Weather weather);
+        void click(StockResp.DataBean stock);
     }
 }

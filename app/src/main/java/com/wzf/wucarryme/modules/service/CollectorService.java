@@ -48,7 +48,7 @@ public class CollectorService extends Service {
     public static final String[] SELL_REG = {"卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%",
         "减掉.*%"};
     public static final String[] SPACE_REG = {"目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%"};
-    public static final String[] CARE_REG = {"领先.*股"};
+    public static final String[] CARE_REG = {"领先.*股", "出现冲涨停", "目前具有上涨", "改写了新高"};
 
     public static final String[] collectDate = {};
     public static final String[] collectURL = {};
@@ -81,7 +81,7 @@ public class CollectorService extends Service {
             unSubscribed();
             if (mIsUnSubscribed) {
                 unSubscribed();
-                int autoRefresh = SharedPreferenceUtil.getInstance().getAutoRefresh();
+                int autoRefresh = SharedPreferenceUtil.getInstance().getBlogAutoRefresh();
                 if (autoRefresh != 0) {
                     mDisposable = Observable.interval(0, autoRefresh, TimeUnit.MINUTES)
                         .observeOn(Schedulers.io())
@@ -141,8 +141,8 @@ public class CollectorService extends Service {
                 if (important(text, SELL_REG) != null) {
                     if (!storedSold.contains(text)) {
                         storedSold.add(text);
-                        insertExcelSELL(text);
                         print(TYPE_SELL, text);
+                        insertExcelSELL(text);
                     }
                 } else if (important(text, BUY_REG) != null) {
                     //买入
@@ -150,7 +150,6 @@ public class CollectorService extends Service {
                         storedBought.add(text);
                         print(TYPE_BUY, text);
                         List<BuySellORM> strings = searchMaybeBought(text);
-                        insertExcelBUY(strings, text);
                         if (strings != null) {
                             for (BuySellORM item : strings) {
                                 String x = "************************买入选择************************";
@@ -162,19 +161,20 @@ public class CollectorService extends Service {
                                 print(TYPE_BUY, x);
                             }
                         }
+                        insertExcelBUY(strings, text);
                     }
                 } else if (important(text, SPACE_REG) != null) {
                     //仓位
                     if (!storedSpace.contains(text)) {
                         storedSpace.add(text);
-                        insertPosition(text);
                         print(TYPE_POSITION, text);
+                        insertPosition(text);
                     }
                 } else if (care != null) {
                     if (!storedCare.contains(text)) {
                         storedCare.add(text);
-                        insertCare(text, care);
                         print(TYPE_CARE, text);
+                        insertCare(text, care);
                     }
                 } else {
                     if (!storedNormal.contains(text)) {

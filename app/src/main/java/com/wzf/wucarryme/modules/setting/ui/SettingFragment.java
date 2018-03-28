@@ -191,7 +191,7 @@ public class SettingFragment extends PreferenceFragment
             mChangeUpdate.setSummary(
                 mSharedPreferenceUtil.getAutoUpdate() == 0 ? "禁止刷新"
                     : String.format(Locale.CHINA, "每%d小时更新", mSharedPreferenceUtil.getAutoUpdate()));
-            getActivity().startService(new Intent(getActivity(), AutoUpdateService.class));
+//            getActivity().startService(new Intent(getActivity(), AutoUpdateService.class));
             alertDialog.dismiss();
         });
     }

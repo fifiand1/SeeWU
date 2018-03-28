@@ -64,9 +64,9 @@ public class AutoUpdateService extends Service {
     }
 
     private void fetchDataByNetWork() {
-        String cityName = SharedPreferenceUtil.getInstance().getCityName();
-        RetrofitSingleton.getInstance()
-            .fetchWeather(cityName)
-            .subscribe(weather -> NotificationHelper.showWeatherNotification(AutoUpdateService.this, weather));
+//        String cityName = SharedPreferenceUtil.getInstance().getCityName();
+//        RetrofitSingleton.getInstance()
+//            .fetchStocks()
+//            .subscribe(weather -> NotificationHelper.showWeatherNotification(AutoUpdateService.this, weather));
     }
 }

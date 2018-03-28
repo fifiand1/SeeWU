@@ -10,15 +10,17 @@ import butterknife.BindView;
 import com.wzf.wucarryme.R;
 import com.wzf.wucarryme.base.BaseViewHolder;
 import com.wzf.wucarryme.component.AnimRecyclerViewAdapter;
+import com.wzf.wucarryme.modules.main.domain.StockResp;
+
 import java.util.ArrayList;
 
 public class CityAdapter extends AnimRecyclerViewAdapter<CityAdapter.CityViewHolder> {
 
     private Context mContext;
-    private ArrayList<String> mDataList;
+    private ArrayList<StockResp.DataBean> mDataList;
     private OnRecyclerViewItemClickListener mOnItemClickListener = null;
 
-    public CityAdapter(Context context, ArrayList<String> dataList) {
+    public CityAdapter(Context context, ArrayList<StockResp.DataBean> dataList) {
         mContext = context;
         this.mDataList = dataList;
     }
@@ -48,7 +50,7 @@ public class CityAdapter extends AnimRecyclerViewAdapter<CityAdapter.CityViewHol
         void onItemClick(View view, int pos);
     }
 
-    class CityViewHolder extends BaseViewHolder<String> {
+    class CityViewHolder extends BaseViewHolder<StockResp.DataBean> {
 
         @BindView(R.id.item_city)
         TextView mItemCity;
@@ -60,8 +62,8 @@ public class CityAdapter extends AnimRecyclerViewAdapter<CityAdapter.CityViewHol
         }
 
         @Override
-        protected void bind(String s) {
-            mItemCity.setText(s);
+        protected void bind(StockResp.DataBean s) {
+            mItemCity.setText(s.toString());
         }
     }
 }

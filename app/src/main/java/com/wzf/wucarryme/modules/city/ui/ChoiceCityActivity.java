@@ -17,7 +17,8 @@ import com.wzf.wucarryme.modules.city.domain.City;
 import com.wzf.wucarryme.modules.city.domain.Province;
 import com.wzf.wucarryme.modules.main.domain.ChangeCityEvent;
 import com.wzf.wucarryme.modules.main.domain.CityORM;
-import com.wzf.wucarryme.modules.main.domain.MultiUpdateEvent;
+import com.wzf.wucarryme.modules.main.domain.SelfSelectUpdateEvent;
+import com.wzf.wucarryme.modules.main.domain.StockResp;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +41,7 @@ public class ChoiceCityActivity extends ToolbarActivity {
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
 
-    private ArrayList<String> dataList = new ArrayList<>();
+    private ArrayList<StockResp.DataBean> dataList = new ArrayList<>();
     private Province selectedProvince;
     private List<Province> provincesList = new ArrayList<>();
     private List<City> cityList;
@@ -109,7 +110,7 @@ public class ChoiceCityActivity extends ToolbarActivity {
                 String city = Util.replaceCity(cityList.get(pos).mCityName);
                 if (isChecked) {
                     OrmLite.getInstance().save(new CityORM(city));
-                    RxBus.getDefault().post(new MultiUpdateEvent());
+                    RxBus.getDefault().post(new SelfSelectUpdateEvent());
                 } else {
                     SharedPreferenceUtil.getInstance().setCityName(city);
                     RxBus.getDefault().post(new ChangeCityEvent());
@@ -136,7 +137,7 @@ public class ChoiceCityActivity extends ToolbarActivity {
         }, BackpressureStrategy.BUFFER)
             .compose(RxUtil.ioF())
             .compose(RxUtil.activityLifecycleF(this))
-            .doOnNext(proName -> dataList.add(proName))
+//            .doOnNext(proName -> dataList.add(proName))
             .doOnComplete(() -> {
                 mProgressBar.setVisibility(View.GONE);
                 currentLevel = LEVEL_PROVINCE;
@@ -182,7 +183,7 @@ public class ChoiceCityActivity extends ToolbarActivity {
         }, BackpressureStrategy.BUFFER)
             .compose(RxUtil.ioF())
             .compose(RxUtil.activityLifecycleF(this))
-            .doOnNext(proName -> dataList.add(proName))
+//            .doOnNext(proName -> dataList.add(proName))
             .doOnComplete(() -> {
                 currentLevel = LEVEL_CITY;
                 mAdapter.notifyDataSetChanged();

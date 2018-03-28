@@ -1,8 +1,11 @@
 package com.wzf.wucarryme.common.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.TypedValue;
 import com.wzf.wucarryme.base.BaseApplication;
+import com.wzf.wucarryme.component.PLog;
 
 public class EnvUtil {
 
@@ -26,4 +29,16 @@ public class EnvUtil {
         }
         return sStatusBarHeight;
     }
+
+    /**
+     * 获取底部 navigation bar 高度
+     */
+    public static int getNavigationBarHeight(Activity mActivity) {
+        Resources resources = mActivity.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        int height = resources.getDimensionPixelSize(resourceId);
+        PLog.i("Nav height:" + height);
+        return height;
+    }
+
 }

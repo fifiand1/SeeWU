@@ -1,6 +1,7 @@
 package com.wzf.wucarryme.common.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.support.annotation.NonNull;
@@ -32,6 +33,20 @@ public class StringUtil {
         return blogTime;
     }
 
+    public static List<String> commaStr2List(String commaStr) {
+        return Arrays.asList(commaStr.split(","));
+    }
+
+    public static String list2commaStr(List<String> list) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            result.append(list.get(i)).append(",");
+        }
+        if (result.toString().endsWith(",")) {
+            result = new StringBuilder(result.substring(0, result.length() - 1));
+        }
+        return result.toString();
+    }
 
     @NonNull
     public static String formatCNName(String cn_name) {

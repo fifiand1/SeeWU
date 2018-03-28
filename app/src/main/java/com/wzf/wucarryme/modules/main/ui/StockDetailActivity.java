@@ -1,27 +1,21 @@
 package com.wzf.wucarryme.modules.main.ui;
 
+import com.wzf.wucarryme.R;
+import com.wzf.wucarryme.base.ToolbarActivity;
+import com.wzf.wucarryme.common.IntentKey;
+import com.wzf.wucarryme.modules.main.adapter.StockAdapter;
+import com.wzf.wucarryme.modules.main.domain.StockResp;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import butterknife.BindView;
-import com.wzf.wucarryme.R;
-import com.wzf.wucarryme.base.ToolbarActivity;
-import com.wzf.wucarryme.common.IntentKey;
-import com.wzf.wucarryme.modules.main.adapter.WeatherAdapter;
-import com.wzf.wucarryme.modules.main.domain.Weather;
 
-/**
- * Created by HugoXie on 2017/6/10.
- *
- * Email: Hugo3641@gmail.com
- * GitHub: https://github.com/xcc3641
- * Info: 多城市详细页面
- */
-
-public class DetailCityActivity extends ToolbarActivity {
+public class StockDetailActivity extends ToolbarActivity {
 
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
@@ -44,19 +38,19 @@ public class DetailCityActivity extends ToolbarActivity {
 
     private void initViewWithData() {
         Intent intent = getIntent();
-        Weather weather = (Weather) intent.getSerializableExtra(IntentKey.WEATHER);
-        if (weather == null) {
+        StockResp.DataBean stock =  intent.getParcelableExtra(IntentKey.STOCK);
+        if (stock == null) {
             finish();
         }
-        safeSetTitle(weather.basic.city);
+        safeSetTitle(stock.getStockName());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        WeatherAdapter mAdapter = new WeatherAdapter(weather);
+        StockAdapter mAdapter = new StockAdapter(stock);
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    public static void launch(Context context, Weather weather) {
-        Intent intent = new Intent(context, DetailCityActivity.class);
-        intent.putExtra(IntentKey.WEATHER, weather);
+    public static void launch(Context context, StockResp.DataBean stock) {
+        Intent intent = new Intent(context, StockDetailActivity.class);
+        intent.putExtra(IntentKey.STOCK, stock);
         context.startActivity(intent);
     }
 }

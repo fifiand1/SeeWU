@@ -10,5 +10,5 @@ package com.wzf.wucarryme.common;
 
 public class IntentKey {
 
-    public static final String WEATHER = "weather";
+    public static final String STOCK = "stock";
 }

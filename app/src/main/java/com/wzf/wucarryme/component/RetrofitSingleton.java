@@ -1,5 +1,9 @@
 package com.wzf.wucarryme.component;
 
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.litesuits.orm.db.assit.WhereBuilder;
 import com.wzf.wucarryme.BuildConfig;
@@ -10,11 +14,10 @@ import com.wzf.wucarryme.common.utils.ToastUtil;
 import com.wzf.wucarryme.common.utils.Util;
 import com.wzf.wucarryme.modules.about.domain.Version;
 import com.wzf.wucarryme.modules.main.domain.CityORM;
-import com.wzf.wucarryme.modules.main.domain.Weather;
+import com.wzf.wucarryme.modules.main.domain.StockResp;
+
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
-import java.io.File;
-import java.util.concurrent.TimeUnit;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
@@ -27,14 +30,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitSingleton {
 
-    private static ApiInterface sApiService = null;
+    private static FounderService sApiService = null;
     private static Retrofit sRetrofit = null;
     private static OkHttpClient sOkHttpClient = null;
 
     private void init() {
         initOkHttp();
         initRetrofit();
-        sApiService = sRetrofit.create(ApiInterface.class);
+        sApiService = sRetrofit.create(FounderService.class);
     }
 
     private RetrofitSingleton() {
@@ -89,7 +92,7 @@ public class RetrofitSingleton {
 
     private static void initRetrofit() {
         sRetrofit = new Retrofit.Builder()
-            .baseUrl(ApiInterface.HOST)
+            .baseUrl(FounderService.HOST)
             .client(sOkHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -110,18 +113,20 @@ public class RetrofitSingleton {
         };
     }
 
-    public Observable<Weather> fetchWeather(String city) {
-        return sApiService.mWeatherAPI(city, C.KEY)
-            .flatMap(weather -> {
-                String status = weather.mWeathers.get(0).status;
-                if ("no more requests".equals(status)) {
-                    return Observable.error(new RuntimeException("/(ㄒoㄒ)/~~,API免费次数已用完"));
-                } else if ("unknown city".equals(status)) {
-                    return Observable.error(new RuntimeException(String.format("API没有%s", city)));
+    public Observable<List<StockResp.DataBean>> fetchStocks() {
+        String random = String.valueOf(Math.random());
+        String codes = "300443,300628,002460,600518,601668,601166,300725,1A0001,2A01,399006";
+        String codeTypes = "4621,4621,4614,4353,4353,4353,4621,4352,4608,4608";
+
+        return sApiService.listStocks(random, codes, codeTypes)
+            .flatMap(resp -> {
+                boolean status = resp.isSuccess();
+                if (status) {
+                    return Observable.just(resp);
                 }
-                return Observable.just(weather);
+                return Observable.error(new RuntimeException("出错了/(ㄒoㄒ)/"));
             })
-            .map(weather -> weather.mWeathers.get(0))
+            .map(StockResp::getData)
             .doOnError(RetrofitSingleton::disposeFailureInfo)
             .compose(RxUtil.io());
     }

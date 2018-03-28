@@ -18,10 +18,14 @@ public class SharedPreferenceUtil {
     public static final String CHANGE_ICONS = "change_icons"; //切换图标
     public static final String CLEAR_CACHE = "clear_cache"; //清空缓存
     public static final String AUTO_UPDATE = "change_update_time"; //自动更新时长
-    public static final String AUTO_REFRESH = "change_refresh_time"; //博客刷新间隔
+    public static final String AUTO_REFRESH_BLOG = "change_refresh_time"; //博客刷新间隔
+    public static final String AUTO_REFRESH_STOCK = "self-select_stock_refresh_time"; //自选刷新间隔
     public static final String NOTIFICATION_MODEL = "notification_model";
     public static final String ANIM_START = "animation_start";
     public static final String WATCHER = "watcher";
+
+    private static final String defaultCodes = "1A0001,2A01,399006";
+    private static final String defaultCodeTypes = "4352,4608,4608";
 
     public static int ONE_HOUR = 1000 * 60 * 60;
 
@@ -93,13 +97,21 @@ public class SharedPreferenceUtil {
         return mPrefs.getInt(AUTO_UPDATE, 3);
     }
 
-    // 自动更新时间 hours
-    public void setAutoRefresh(int t) {
-        mPrefs.edit().putInt(AUTO_REFRESH, t).apply();
+    // 博客刷新时间 minute
+    public void setBlogAutoRefresh(int t) {
+        mPrefs.edit().putInt(AUTO_REFRESH_BLOG, t).apply();
     }
 
-    public int getAutoRefresh() {
-        return mPrefs.getInt(AUTO_REFRESH, 1);
+    public int getBlogAutoRefresh() {
+        return mPrefs.getInt(AUTO_REFRESH_BLOG, 1);
+    }
+    // 自选刷新时间 second
+    public void setStockAutoRefresh(int t) {
+        mPrefs.edit().putInt(AUTO_REFRESH_STOCK, t).apply();
+    }
+
+    public int getStockAutoRefresh() {
+        return mPrefs.getInt(AUTO_REFRESH_STOCK, 60);
     }
 
     //当前城市

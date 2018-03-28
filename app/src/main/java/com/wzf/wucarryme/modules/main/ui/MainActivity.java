@@ -4,14 +4,11 @@ import com.wzf.wucarryme.R;
 import com.wzf.wucarryme.base.BaseActivity;
 import com.wzf.wucarryme.common.C;
 import com.wzf.wucarryme.common.utils.CircularAnimUtil;
-import com.wzf.wucarryme.common.utils.DoubleClickExit;
 import com.wzf.wucarryme.common.utils.RxDrawer;
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
-import com.wzf.wucarryme.common.utils.ToastUtil;
 import com.wzf.wucarryme.modules.about.ui.AboutActivity;
 import com.wzf.wucarryme.modules.city.ui.ChoiceCityActivity;
 import com.wzf.wucarryme.modules.main.adapter.HomePagerAdapter;
-import com.wzf.wucarryme.modules.service.AutoUpdateService;
 import com.wzf.wucarryme.modules.service.CollectorService;
 import com.wzf.wucarryme.modules.setting.ui.SettingActivity;
 
@@ -49,7 +46,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout mDrawerLayout;
 
     private MainFragment mMainFragment;
-    private MultiCityFragment mMultiCityFragment;
+    private SelfSelectStockFragment mMultiCityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +54,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         initView();
         initDrawer();
         initIcon();
-        startService(new Intent(this, AutoUpdateService.class));
+//        startService(new Intent(this, AutoUpdateService.class));
         startService(new Intent(this, CollectorService.class));
     }
 
@@ -85,7 +82,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mFab.setOnClickListener(v -> showShareDialog());
         HomePagerAdapter mAdapter = new HomePagerAdapter(getSupportFragmentManager());
         mMainFragment = new MainFragment();
-        mMultiCityFragment = new MultiCityFragment();
+        mMultiCityFragment = new SelfSelectStockFragment();
         mAdapter.addTab(mMainFragment, "");
         mAdapter.addTab(mMultiCityFragment, "");
         mViewPager.setAdapter(mAdapter);
@@ -166,7 +163,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void changeFabState(int position) {
         if (position == 1) {
             mFab.setImageResource(R.drawable.ic_add_24dp);
-            mFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)));
+            mFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(MainActivity.this, R.color
+                .colorPrimary)));
             mFab.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity.this, ChoiceCityActivity.class);
                 intent.putExtra(C.MULTI_CHECK, true);
@@ -174,7 +172,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             });
         } else {
             mFab.setImageResource(R.drawable.ic_favorite);
-            mFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(MainActivity.this, R.color.colorAccent)));
+            mFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(MainActivity.this, R.color
+                .colorAccent)));
             mFab.setOnClickListener(v -> showShareDialog());
         }
     }
@@ -188,11 +187,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            if (!DoubleClickExit.check()) {
-                ToastUtil.showShort(getString(R.string.double_exit));
-            } else {
-                finish();
-            }
+            super.onBackPressed();
         }
+//        else {
+//            不退出
+//            if (!DoubleClickExit.check()) {
+//                ToastUtil.showShort(getString(R.string.double_exit));
+//            } else {
+//                finish();
+//            }
+//        }
     }
 }

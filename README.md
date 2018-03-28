@@ -1,18 +1,12 @@
-# 就看天气
+# WU carry me!
 [![Build Status](https://travis-ci.org/xcc3641/SeeWeather.svg?branch=master)](https://travis-ci.org/xcc3641/SeeWeather)
 
-就看天气该应用就是如同它的名字一样，只做一个单纯、简单的看天气软件。这么多天气软件，你选择了我，这是我的幸运。
-
-从15年10月上线，到目前经历两次重大改版，一次代码的重构，一次界面的大幅度改动，目的都是为了你们。
-在开源的过程中，收到了很多来自有趣的你们的邮件。我也曾遇到过棘手的问题无处咨询又谷歌不到。那个时候的我，也可能是现在的你。所以我希望能够帮助到你。
+通过jsoup采集博客直播内容, 跟踪仓位变化, 以及猜测自选
 
 ----
 
 ### 简介
-就看天气——是一款遵循 **Material Design** 风格的只看天气的APP。
-- 卡片展现（当前天气情况，未来几小时天气情况，生活建议，一周七天概况）
-- 缓存数据，减少网络请求，保证离线查看
-- 内置两套图标（设置里更改）
+fork from就看天气 ——是一款遵循 **Material Design** 风格的只看天气的APP。
 
 
 ----
@@ -20,16 +14,8 @@
 权限说明
 
 ```xml
-	<!--用于进行网络定位-->
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	<!--用于访问GPS定位-->
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-	<!--获取运营商信息，用于支持提供运营商信息相关的接口-->
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<!--用于访问wifi网络信息，wifi信息会用于进行网络定位-->
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-	<!--这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位-->
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<!--用于访问网络，网络定位需要上网-->
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<!--用于读取手机当前的状态-->
@@ -42,36 +28,32 @@
 
 ### 下载地址
 
-Fir.im: http://fir.im/seeWeather
-
-酷安市场：http://www.coolapk.com/apk/com.xiecc.seeWeather
-
-豌豆荚：http://www.wandoujia.com/apps/com.xiecc.seeWeather
-
 [更新日志](changeLog.md)
 
 
 ### TODO
 
-- [ ] 桌面小部件
+- [x] excel-->SQLite-->assets-->copy to database
+- [x] spaceChange-->LocalNotification
+- [x] collector service(jsoup)
 - [x] 通知栏提醒
-- [x] 更好，更多的天气ICONS
-- [x] 管理城市（多城市选择）
-- [x] 自动定位
-- [ ] 自由定制的Item界面
+- [ ] UI(直播仓位变化)
+- [ ] UI(直播关注个股)
+- [ ] UI(直播内容)
+- [ ] UI(实时行情)
+- [ ] UI(历史仓位变化图表)
+- [ ] UI(关注个股查询)
+- [ ] 管理自选股
+- [ ] widget桌面小部件(stock)
+- [ ] 数据去中心化同步
+- [ ] 更好，更多的ICONS
 - [ ] 引导页面
 
 
 ----
 
 ### 项目
-#### 公开 API
 
-天气数据来源于：和风天气
-
-城市信息来源于：CSDN
-
-地理定位服务： 高德地图
 
 #### 开源技术
 1. [Rxjava][2]
@@ -86,7 +68,7 @@ Fir.im: http://fir.im/seeWeather
 ![][image-3]
 
 ### 感谢
-感谢开源，学习到了前辈们优秀的代码：
+感谢开源，感谢See Weather，学习到了前辈们优秀的代码：
 - [@张鸿洋][7]
 - [@扔物线][8]
 - [@drakeet][9]

@@ -1,17 +1,18 @@
 package com.wzf.wucarryme.modules.main.ui;
 
+import java.util.List;
+
 import com.wzf.wucarryme.R;
 import com.wzf.wucarryme.base.BaseFragment;
 import com.wzf.wucarryme.common.utils.RxUtil;
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
 import com.wzf.wucarryme.common.utils.ToastUtil;
 import com.wzf.wucarryme.common.utils.VersionUtil;
-import com.wzf.wucarryme.component.NotificationHelper;
 import com.wzf.wucarryme.component.RetrofitSingleton;
 import com.wzf.wucarryme.component.RxBus;
-import com.wzf.wucarryme.modules.main.adapter.WeatherAdapter;
+import com.wzf.wucarryme.modules.main.adapter.StockAdapter;
 import com.wzf.wucarryme.modules.main.domain.ChangeCityEvent;
-import com.wzf.wucarryme.modules.main.domain.Weather;
+import com.wzf.wucarryme.modules.main.domain.StockResp;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -48,8 +49,8 @@ public class MainFragment extends BaseFragment {
     @BindView(R.id.iv_erro)
     ImageView mIvError;
 
-    private static Weather mWeather = new Weather();
-    private WeatherAdapter mAdapter;
+    private static StockResp.DataBean mWeather = new StockResp.DataBean();
+    private StockAdapter mAdapter;
 
     private View view;
 
@@ -102,7 +103,7 @@ public class MainFragment extends BaseFragment {
         }
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter = new WeatherAdapter(mWeather);
+        mAdapter = new StockAdapter(mWeather);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -122,16 +123,16 @@ public class MainFragment extends BaseFragment {
                 mIvError.setVisibility(View.GONE);
                 mRecyclerView.setVisibility(View.VISIBLE);
 
-                mWeather.status = weather.status;
-                mWeather.aqi = weather.aqi;
-                mWeather.basic = weather.basic;
-                mWeather.suggestion = weather.suggestion;
-                mWeather.now = weather.now;
-                mWeather.dailyForecast = weather.dailyForecast;
-                mWeather.hourlyForecast = weather.hourlyForecast;
-                safeSetTitle(weather.basic.city);
-                mAdapter.notifyDataSetChanged();
-                NotificationHelper.showWeatherNotification(getActivity(), weather);
+//                mWeather.status = weather.status;
+//                mWeather.aqi = weather.aqi;
+//                mWeather.basic = weather.basic;
+//                mWeather.suggestion = weather.suggestion;
+//                mWeather.now = weather.now;
+//                mWeather.dailyForecast = weather.dailyForecast;
+//                mWeather.hourlyForecast = weather.hourlyForecast;
+//                safeSetTitle(weather.basic.city);
+//                mAdapter.notifyDataSetChanged();
+//                NotificationHelper.showWeatherNotification(getActivity(), weather);
             })
             .doOnComplete(() -> {
                 mRefreshLayout.setRefreshing(false);
@@ -144,10 +145,10 @@ public class MainFragment extends BaseFragment {
     /**
      * 从网络获取
      */
-    private Observable<Weather> fetchDataByNetWork() {
+    private Observable<List<StockResp.DataBean>> fetchDataByNetWork() {
         String cityName = SharedPreferenceUtil.getInstance().getCityName();
         return RetrofitSingleton.getInstance()
-            .fetchWeather(cityName)
+            .fetchStocks()
             .compose(RxUtil.fragmentLifecycle(this));
     }
 
@@ -165,7 +166,7 @@ public class MainFragment extends BaseFragment {
 
     }
 
-    public Weather getWeather() {
+    public StockResp.DataBean getWeather() {
         return mWeather;
     }
 }

@@ -17,27 +17,28 @@ public class CardCityHelper {
     private static final String SU_ZHOU = "苏州";
     private static final String OTHER = "其他";
 
-    private static Map<WeatherInfo, Integer> sMap = new HashMap<>();
+//    private static Map<WeatherInfo, Integer> sMap = new HashMap<>();
 
-    static {
+//    static {
         // 上海
-        sMap.put(new WeatherInfo(SUNNY_CODE, SHANG_HAI), R.mipmap.city_shanghai_sunny);
-        sMap.put(new WeatherInfo(RAINY_CODE, SHANG_HAI), R.mipmap.city_shanghai_rainy);
-        sMap.put(new WeatherInfo(CLOUDY_CODE, SHANG_HAI), R.mipmap.city_shanghai_cloudy);
-        // 北京
-        sMap.put(new WeatherInfo(SUNNY_CODE, BEI_JING), R.mipmap.city_beijing_sunny);
-        sMap.put(new WeatherInfo(RAINY_CODE, BEI_JING), R.mipmap.city_beijing_rainy);
-        sMap.put(new WeatherInfo(CLOUDY_CODE, BEI_JING), R.mipmap.city_beijing_cloudy);
-        // 苏州
-        sMap.put(new WeatherInfo(SUNNY_CODE, SU_ZHOU), R.mipmap.city_suzhou_sunny);
-        sMap.put(new WeatherInfo(RAINY_CODE, SU_ZHOU), R.mipmap.city_suzhou_rain);
-        sMap.put(new WeatherInfo(CLOUDY_CODE, SU_ZHOU), R.mipmap.city_suzhou_cloudy);
-        // 其他
-        sMap.put(new WeatherInfo(SUNNY_CODE, OTHER), R.mipmap.city_other_sunny);
-        sMap.put(new WeatherInfo(RAINY_CODE, OTHER), R.mipmap.city_other_rainy);
-        sMap.put(new WeatherInfo(CLOUDY_CODE, OTHER), R.mipmap.city_other_cloudy);
-    }
+//        sMap.put(new WeatherInfo(SUNNY_CODE, SHANG_HAI), R.mipmap.city_shanghai_sunny);
+//        sMap.put(new WeatherInfo(RAINY_CODE, SHANG_HAI), R.mipmap.city_shanghai_rainy);
+//        sMap.put(new WeatherInfo(CLOUDY_CODE, SHANG_HAI), R.mipmap.city_shanghai_cloudy);
+//        // 北京
+//        sMap.put(new WeatherInfo(SUNNY_CODE, BEI_JING), R.mipmap.city_beijing_sunny);
+//        sMap.put(new WeatherInfo(RAINY_CODE, BEI_JING), R.mipmap.city_beijing_rainy);
+//        sMap.put(new WeatherInfo(CLOUDY_CODE, BEI_JING), R.mipmap.city_beijing_cloudy);
+//        // 苏州
+//        sMap.put(new WeatherInfo(SUNNY_CODE, SU_ZHOU), R.mipmap.city_suzhou_sunny);
+//        sMap.put(new WeatherInfo(RAINY_CODE, SU_ZHOU), R.mipmap.city_suzhou_rain);
+//        sMap.put(new WeatherInfo(CLOUDY_CODE, SU_ZHOU), R.mipmap.city_suzhou_cloudy);
+//        // 其他
+//        sMap.put(new WeatherInfo(SUNNY_CODE, OTHER), R.mipmap.city_other_sunny);
+//        sMap.put(new WeatherInfo(RAINY_CODE, OTHER), R.mipmap.city_other_rainy);
+//        sMap.put(new WeatherInfo(CLOUDY_CODE, OTHER), R.mipmap.city_other_cloudy);
+//    }
 
+    // 先预留着 到时候优化UI
     void applyStatus(int code, String city, View view) {
         if (code >= 300 && code < 408) {
             code = RAINY_CODE;
@@ -49,36 +50,10 @@ public class CardCityHelper {
         if (!city.matches(String.format("(?:%s|%s|%s)", SU_ZHOU, SHANG_HAI, BEI_JING))) {
             city = OTHER;
         }
-        Integer mipRes = sMap.get(new WeatherInfo(code, city));
-        if (mipRes != null) {
-            view.setBackground(ContextCompat.getDrawable(view.getContext(), mipRes));
-        }
+//        Integer mipRes = sMap.get(new WeatherInfo(code, city));
+//        if (mipRes != null) {
+//            view.setBackground(ContextCompat.getDrawable(view.getContext(), mipRes));
+//        }
     }
 
-    private static class WeatherInfo {
-        int weatherCode;
-        String city;
-
-        public WeatherInfo(int weatherCode, String city) {
-            this.weatherCode = weatherCode;
-            this.city = city;
-        }
-
-        private String code() {
-            return String.valueOf(String.format("%s%s", weatherCode, city));
-        }
-
-        @Override
-        public int hashCode() {
-            return 31 * 17 + code().hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof WeatherInfo) {
-                return this.code().equals(((WeatherInfo) o).code());
-            }
-            return super.equals(o);
-        }
-    }
 }
