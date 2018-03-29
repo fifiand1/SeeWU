@@ -92,7 +92,7 @@ public class CollectorService extends Service {
                         .doOnNext(aLong -> {
                             LogUtil.d(TAG, "jsoup Article " + Thread.currentThread().getName());
                             mIsUnSubscribed = false;
-                            if (TimeUtil.isKP()) {
+                            if (TimeUtil.isKP() || storedNormal.size() == 0) {
                                 jsoupArticle();
                             }
                         })
@@ -123,7 +123,7 @@ public class CollectorService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.i(TAG, "URL " + todayURL);
+        LogUtil.i(TAG, "URL " + todayURL);
     }
 
     private void jsoupArticle() {
@@ -134,7 +134,7 @@ public class CollectorService extends Service {
             Elements p = content.getElementsByTag("p");
             for (Element element : p) {
                 String text = element.text();
-//                Log.i(TAG, "get one-> " + text);
+//                LogUtil.i(TAG, "get one-> " + text);
 
                 String care = important(text, CARE_REG);
                 //卖出
@@ -302,16 +302,16 @@ public class CollectorService extends Service {
 
             }
             int result = OrmLite.getInstance().insert(list);
-            Log.d(TAG, "add care: " + result);
+            LogUtil.d(TAG, "add care: " + result);
 //            long l = OrmLite.getInstance().queryCount(CareORM.class);
-//            Log.d(TAG, "after care: " + l);
+//            LogUtil.d(TAG, "after care: " + l);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void print(String type, String text) {
-        Log.i(TAG, type + " -> " + text);
+        LogUtil.w(TAG, type + " -> " + text);
     }
 
     private void insertExcelSELL(String s) {

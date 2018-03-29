@@ -9,6 +9,7 @@ import com.litesuits.orm.db.assit.WhereBuilder;
 import com.wzf.wucarryme.BuildConfig;
 import com.wzf.wucarryme.base.BaseApplication;
 import com.wzf.wucarryme.common.C;
+import com.wzf.wucarryme.common.utils.LogUtil;
 import com.wzf.wucarryme.common.utils.RxUtil;
 import com.wzf.wucarryme.common.utils.ToastUtil;
 import com.wzf.wucarryme.common.utils.Util;
@@ -30,6 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitSingleton {
 
+    private static final String TAG = RetrofitSingleton.class.getSimpleName();
     private static FounderService sApiService = null;
     private static Retrofit sRetrofit = null;
     private static OkHttpClient sOkHttpClient = null;
@@ -82,9 +84,9 @@ public class RetrofitSingleton {
             builder.addNetworkInterceptor(new StethoInterceptor());
         }
         //设置超时
-        builder.connectTimeout(15, TimeUnit.SECONDS);
-        builder.readTimeout(20, TimeUnit.SECONDS);
-        builder.writeTimeout(20, TimeUnit.SECONDS);
+        builder.connectTimeout(10, TimeUnit.SECONDS);
+        builder.readTimeout(10, TimeUnit.SECONDS);
+        builder.writeTimeout(10, TimeUnit.SECONDS);
         //错误重连
         builder.retryOnConnectionFailure(true);
         sOkHttpClient = builder.build();
@@ -122,6 +124,7 @@ public class RetrofitSingleton {
             .flatMap(resp -> {
                 boolean status = resp.isSuccess();
                 if (status) {
+                    LogUtil.i(TAG, resp.toString());
                     return Observable.just(resp);
                 }
                 return Observable.error(new RuntimeException("出错了/(ㄒoㄒ)/"));

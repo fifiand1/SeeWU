@@ -75,7 +75,7 @@ public class MainFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         initView();
         load();
-        VersionUtil.checkVersion(getActivity());
+//        VersionUtil.checkVersion(getActivity());
     }
 
     @Override
@@ -109,6 +109,7 @@ public class MainFragment extends BaseFragment {
 
     private void load() {
         if (1 == 1) {
+            mRefreshLayout.setRefreshing(false);
             return;
         }
         fetchDataByNetWork()

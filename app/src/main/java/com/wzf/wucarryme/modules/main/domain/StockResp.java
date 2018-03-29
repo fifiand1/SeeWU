@@ -1,6 +1,5 @@
 package com.wzf.wucarryme.modules.main.domain;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
@@ -650,7 +649,7 @@ public class StockResp implements Parcelable {
              * stockName : 亿联网络
              * newPrice : 102.07
              * risePrice : 0.0257*/
-            return stockName + "\t" + newPrice + "\t" + getFormattedPrice() + "%";
+            return stockName + "\t" + newPrice + "\t" + getFormattedPrice();
         }
 
         @Override
@@ -659,8 +658,9 @@ public class StockResp implements Parcelable {
         }
 
         public String getFormattedPrice() {
-            return String.format(Locale.CHINA, "%.2f", (Float.parseFloat
-                (risePrice == null ? "-99" : risePrice) * 100));
+            String start = risePrice.startsWith("-") ? "" : "+";
+            return start + String.format(Locale.CHINA, "%.2f", (Float.parseFloat
+                (risePrice == null ? "-99.00" : risePrice) * 100)) + "%";
         }
     }
 }

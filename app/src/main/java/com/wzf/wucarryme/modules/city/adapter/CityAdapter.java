@@ -27,7 +27,7 @@ public class CityAdapter extends AnimRecyclerViewAdapter<CityAdapter.CityViewHol
 
     @Override
     public CityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new CityViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_city, parent, false));
+        return new CityViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_stock, parent, false));
     }
 
     @Override

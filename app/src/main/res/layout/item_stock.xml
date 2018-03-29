@@ -19,7 +19,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:src="@drawable/icon_city"
+            card_view:srcCompat="@drawable/icon_city"
             android:layout_width="24dp"
             android:layout_height="24dp"/>
 

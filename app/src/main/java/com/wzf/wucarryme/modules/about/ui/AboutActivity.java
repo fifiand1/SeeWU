@@ -82,7 +82,7 @@ public class AboutActivity extends BaseActivity {
                 goToHtml(getString(R.string.bugTableUrl));
                 break;
             case R.id.bt_update:
-                VersionUtil.checkVersion(this, true);
+//                VersionUtil.checkVersion(this, true);
                 break;
         }
     }

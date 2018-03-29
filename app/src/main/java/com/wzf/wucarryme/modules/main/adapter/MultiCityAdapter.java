@@ -16,63 +16,62 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.wzf.wucarryme.R;
 import com.wzf.wucarryme.base.BaseViewHolder;
+import com.wzf.wucarryme.component.AnimRecyclerViewAdapter;
 import com.wzf.wucarryme.component.PLog;
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
 import com.wzf.wucarryme.common.utils.Util;
 import com.wzf.wucarryme.modules.main.domain.StockResp;
 import java.util.List;
 
-public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.MultiCityViewHolder> {
+public class MultiCityAdapter extends AnimRecyclerViewAdapter<MultiCityAdapter.MultiStockViewHolder> {
     private Context mContext;
-    private List<StockResp.DataBean> mWeatherList;
+    private List<StockResp.DataBean> mStockList;
     private onMultiCityClick mMultiCityClick;
 
     public void setMultiCityClick(onMultiCityClick multiCityClick) {
         this.mMultiCityClick = multiCityClick;
     }
 
-    public MultiCityAdapter(List<StockResp.DataBean> weatherList) {
-        mWeatherList = weatherList;
+    public MultiCityAdapter(List<StockResp.DataBean> stockList) {
+        mStockList = stockList;
     }
 
     @Override
-    public MultiCityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MultiStockViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
-        return new MultiCityViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_multi_city, parent, false));
+        return new MultiStockViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_multi_stock, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(MultiCityViewHolder holder, int position) {
+    public void onBindViewHolder(MultiStockViewHolder holder, int position) {
 
-        holder.bind(mWeatherList.get(position));
+        holder.bind(mStockList.get(position));
         holder.itemView.setOnLongClickListener(v -> {
-            mMultiCityClick.longClick(mWeatherList.get(holder.getAdapterPosition()));
+            mMultiCityClick.longClick(mStockList.get(holder.getAdapterPosition()));
             return true;
         });
-        holder.itemView.setOnClickListener(v -> mMultiCityClick.click(mWeatherList.get(holder.getAdapterPosition())));
+        holder.itemView.setOnClickListener(v -> mMultiCityClick.click(mStockList.get(holder.getAdapterPosition())));
     }
 
     @Override
     public int getItemCount() {
-        return mWeatherList.size();
+        return mStockList.size();
     }
 
     public boolean isEmpty() {
-        return 0 == mWeatherList.size();
+        return 0 == getItemCount();
     }
 
-    class MultiCityViewHolder extends BaseViewHolder<StockResp.DataBean> {
+    class MultiStockViewHolder extends BaseViewHolder<StockResp.DataBean> {
 
         @BindView(R.id.dialog_city)
         TextView mDialogCity;
-        @BindView(R.id.dialog_icon)
-        ImageView mDialogIcon;
         @BindView(R.id.dialog_temp)
         TextView mDialogTemp;
         @BindView(R.id.cardView)
         CardView mCardView;
 
-        public MultiCityViewHolder(View itemView) {
+        public MultiStockViewHolder(View itemView) {
             super(itemView);
         }
 
@@ -86,19 +85,19 @@ public class MultiCityAdapter extends RecyclerView.Adapter<MultiCityAdapter.Mult
                 PLog.e(e.getMessage());
             }
 
-            Glide.with(mContext)
-                .load(SharedPreferenceUtil.getInstance().getInt("none", R.mipmap.none))
-                .asBitmap()
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        mDialogIcon.setImageBitmap(resource);
-                        mDialogIcon.setColorFilter(Color.WHITE);
-                    }
-                });
+//            Glide.with(mContext)
+//                .load(SharedPreferenceUtil.getInstance().getInt("none", R.mipmap.none))
+//                .asBitmap()
+//                .into(new SimpleTarget<Bitmap>() {
+//                    @Override
+//                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+//                        mDialogIcon.setImageBitmap(resource);
+//                        mDialogIcon.setColorFilter(Color.WHITE);
+//                    }
+//                });
 
-//            int code = Integer.valueOf(stock.now.cond.code);
-//            new CardCityHelper().applyStatus(code, stock.basic.city, mCardView);
+//            ViewStyleHelper.applyStatus(stock, mCardView);
+            ViewStyleHelper.applyColor(stock, mDialogTemp);
         }
     }
 

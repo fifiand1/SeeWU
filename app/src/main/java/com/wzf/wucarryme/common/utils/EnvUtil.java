@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.TypedValue;
 import com.wzf.wucarryme.base.BaseApplication;
-import com.wzf.wucarryme.component.PLog;
 
 public class EnvUtil {
 
+    private static final String TAG = EnvUtil.class.getSimpleName();
     private static int sStatusBarHeight;
 
     public static int getActionBarSize(Context context) {
@@ -37,7 +37,7 @@ public class EnvUtil {
         Resources resources = mActivity.getResources();
         int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
         int height = resources.getDimensionPixelSize(resourceId);
-        PLog.i("Nav height:" + height);
+        LogUtil.i(TAG, "Nav height:" + height);
         return height;
     }
 

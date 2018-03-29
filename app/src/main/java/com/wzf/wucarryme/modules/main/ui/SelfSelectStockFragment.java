@@ -1,18 +1,19 @@
 package com.wzf.wucarryme.modules.main.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import com.wzf.wucarryme.R;
 import com.wzf.wucarryme.base.BaseFragment;
+import com.wzf.wucarryme.common.utils.LogUtil;
 import com.wzf.wucarryme.common.utils.RxUtil;
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
+import com.wzf.wucarryme.common.utils.TimeUtil;
 import com.wzf.wucarryme.component.RetrofitSingleton;
-import com.wzf.wucarryme.component.RxBus;
 import com.wzf.wucarryme.modules.main.adapter.MultiCityAdapter;
-import com.wzf.wucarryme.modules.main.domain.SelfSelectUpdateEvent;
 import com.wzf.wucarryme.modules.main.domain.StockResp;
 
 import android.os.Bundle;
@@ -61,7 +62,7 @@ public class SelfSelectStockFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle
         savedInstanceState) {
         if (view == null) {
-            view = inflater.inflate(R.layout.fragment_multicity, container, false);
+            view = inflater.inflate(R.layout.fragment_self_select_stocks, container, false);
             ButterKnife.bind(this, view);
         }
         return view;
@@ -70,10 +71,11 @@ public class SelfSelectStockFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RxBus.getDefault()
-            .toObservable(SelfSelectUpdateEvent.class)
-            .doOnNext(event -> multiLoad())
-            .subscribe();
+        // TODO: 2018/3/29 leaks here
+//        RxBus.getDefault()
+//            .toObservable(SelfSelectUpdateEvent.class)
+//            .doOnNext(event -> multiLoad())
+//            .subscribe();
     }
 
     @Override
@@ -94,7 +96,7 @@ public class SelfSelectStockFragment extends BaseFragment {
                 new AlertDialog.Builder(getActivity())
                     .setMessage("是否删除该自选股?")
                     .setPositiveButton("删除", (dialog, which) -> {
-                        // TODO: 2018/3/28 自选保存到数据库
+                        // TODO: 2018/3/28 自选保存到数据库或sp
 //                        OrmLite.getInstance().delete(new WhereBuilder(CityORM.class).where("name=?", city));
                         multiLoad();
                         Snackbar.make(getView(), String.format(Locale.CHINA, "已经将%s删掉了 Ծ‸ Ծ", stock.getStockName()),
@@ -118,18 +120,18 @@ public class SelfSelectStockFragment extends BaseFragment {
         mRefreshLayout.setColorSchemeResources(
             android.R.color.holo_orange_light,
             android.R.color.holo_red_light,
-            android.R.color.holo_green_light,
-            android.R.color.holo_blue_bright
+            android.R.color.holo_green_dark,
+            android.R.color.holo_blue_dark
         );
-        mRefreshLayout.setOnRefreshListener(() -> mRefreshLayout.postDelayed(this::multiLoad, 1000));
+        mRefreshLayout.setOnRefreshListener(this::multiLoad);
     }
 
     private void multiLoad() {
-        if (disposable != null && !disposable.isDisposed()) {
+        if (disposable != null) {
             disposable.dispose();
         }
         int autoRefresh = SharedPreferenceUtil.getInstance().getStockAutoRefresh();
-        disposable = Observable.interval(0, autoRefresh, TimeUnit.SECONDS)
+        disposable = Observable.interval(0, 10, TimeUnit.SECONDS)
 
 //            .doOnSubscribe(subscription -> mRefreshLayout.setRefreshing(true))
 //            .map(city -> Util.replaceCity(city.getName()))
@@ -139,29 +141,44 @@ public class SelfSelectStockFragment extends BaseFragment {
 //            .take(3)
             .doOnSubscribe(disposable -> mRefreshLayout.setRefreshing(true))
             .flatMap(aLong -> {
-                mStocks.clear();
-                return RetrofitSingleton.getInstance().fetchStocks();
+                LogUtil.i(TAG, Thread.currentThread().getName() + " flatMap " + aLong);
+                if (TimeUtil.isKP() || mStocks.size() == 0) {
+                    return RetrofitSingleton.getInstance().fetchStocks();
+                } else {
+                    return Observable.just(aLong);
+                }
             })
             .compose(RxUtil.fragmentLifecycle(this))
             .doOnNext(stocks -> {
-                mStocks.addAll(stocks);
-//                Log.i(TAG, "multiLoad: onNext " + mStocks.size());
+                LogUtil.i(TAG, Thread.currentThread().getName() + " onNext " + stocks);
                 mRefreshLayout.setRefreshing(false);
-                mAdapter.notifyDataSetChanged();
+                if (stocks instanceof ArrayList) {
+                    ArrayList<StockResp.DataBean> stocks1 = (ArrayList<StockResp.DataBean>) stocks;
+                    if (mStocks.size() == 0) {
+                        mStocks.addAll(stocks1);
+                    } else {
+                        Collections.copy(mStocks, stocks1);
+                    }
+                    mAdapter.notifyDataSetChanged();
+                }
                 if (mAdapter.isEmpty()) {
                     mLayout.setVisibility(View.VISIBLE);
                 } else {
                     mLayout.setVisibility(View.GONE);
                 }
             })
-//            .doOnDispose(() -> Log.i(TAG, "doOnDispose: "))
-//            .doOnComplete(() -> {
-//            })
+            .doOnDispose(() -> LogUtil.i(TAG, "doOnDispose: "))
+            .doOnComplete(() -> {
+                LogUtil.i(TAG, "doOnComplete: ");
+            })
             .doOnError(error -> {
+                mRefreshLayout.setRefreshing(false);
                 if (mAdapter.isEmpty()) {
                     mLayout.setVisibility(View.VISIBLE);
                 }
             })
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeOn(AndroidSchedulers.mainThread())
             .subscribe();
 
     }

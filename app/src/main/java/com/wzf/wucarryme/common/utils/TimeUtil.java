@@ -75,6 +75,12 @@ public class TimeUtil {
 
 
     public static boolean isKP() {
+        Calendar calendar = Calendar.getInstance(Locale.CHINA);
+        calendar.setTime(new Date());
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        if (day == Calendar.SUNDAY || day == Calendar.SATURDAY) {
+            return false;
+        }
         SimpleDateFormat format = new SimpleDateFormat("HHmm", Locale.CHINA);
         String startAM = "0915", endAM = "1130", startPM = "1300", endPM = "1500";
         Date dateStartAM, dateEndAM, dateStartPM, dateEndPM;
@@ -88,8 +94,37 @@ public class TimeUtil {
             Date date = format.parse(format.format(new Date()));
             boolean isKP = (date.after(dateStartAM) && date.before(dateEndAM))
                 || (date.after(dateStartPM) && date.before(dateEndPM));
-            LogUtil.d(TAG, format.format(date) + " isKP: " + isKP);
+            String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
+
+            LogUtil.d(TAG, "[" + methodName + "] " + format.format(date) + " isKP: " + isKP);
             return isKP;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean isSP(boolean isNooning) {
+        SimpleDateFormat format = new SimpleDateFormat("HHmm", Locale.CHINA);
+        String startAM = "0915", endAM = "1130", startPM = "1300", endPM = "1500";
+        Date dateStartAM, dateEndAM, dateStartPM, dateEndPM;
+
+        try {
+            dateStartAM = format.parse(startAM);
+            dateEndAM = format.parse(endAM);
+            dateStartPM = format.parse(startPM);
+            dateEndPM = format.parse(endPM);
+
+            Date date = format.parse(format.format(new Date()));
+            boolean isSP;
+            if (isNooning) {
+                isSP = date.after(dateEndAM) && date.before(dateStartPM);
+            } else {
+                isSP = date.after(dateEndPM);
+            }
+            LogUtil.d(TAG, format.format(date) + " isSP " + isNooning + ": " + isSP);
+
+            return isSP;
         } catch (ParseException e) {
             e.printStackTrace();
         }

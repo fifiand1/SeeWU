@@ -33,7 +33,7 @@ public class FileSizeUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("获取文件大小", "获取失败!");
+            LogUtil.e("获取文件大小", "获取失败!");
         }
         return FormetFileSize(blockSize, sizeType);
 
@@ -78,7 +78,7 @@ public class FileSizeUtil {
         }
         else {
             file.createNewFile();
-            Log.e("获取文件大小", "文件不存在!");
+            LogUtil.e("获取文件大小", "文件不存在!");
         }
         return size;
     }
