@@ -1,29 +1,22 @@
 package com.wzf.wucarryme.modules.main.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+
 import com.wzf.wucarryme.R;
 import com.wzf.wucarryme.base.BaseViewHolder;
 import com.wzf.wucarryme.component.AnimRecyclerViewAdapter;
 import com.wzf.wucarryme.component.PLog;
-import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
 import com.wzf.wucarryme.common.utils.Util;
 import com.wzf.wucarryme.modules.main.domain.StockResp;
 import java.util.List;
 
-public class MultiCityAdapter extends AnimRecyclerViewAdapter<MultiCityAdapter.MultiStockViewHolder> {
+public class MultiStockAdapter extends AnimRecyclerViewAdapter<MultiStockAdapter.MultiStockViewHolder> {
     private Context mContext;
     private List<StockResp.DataBean> mStockList;
     private onMultiCityClick mMultiCityClick;
@@ -32,7 +25,7 @@ public class MultiCityAdapter extends AnimRecyclerViewAdapter<MultiCityAdapter.M
         this.mMultiCityClick = multiCityClick;
     }
 
-    public MultiCityAdapter(List<StockResp.DataBean> stockList) {
+    public MultiStockAdapter(List<StockResp.DataBean> stockList) {
         mStockList = stockList;
     }
 
@@ -64,10 +57,12 @@ public class MultiCityAdapter extends AnimRecyclerViewAdapter<MultiCityAdapter.M
 
     class MultiStockViewHolder extends BaseViewHolder<StockResp.DataBean> {
 
-        @BindView(R.id.dialog_city)
-        TextView mDialogCity;
-        @BindView(R.id.dialog_temp)
-        TextView mDialogTemp;
+        @BindView(R.id.dialog_name)
+        TextView mDialogName;
+        @BindView(R.id.dialog_rise)
+        TextView mDialogRise;
+        @BindView(R.id.dialog_price)
+        TextView mDialogPrice;
         @BindView(R.id.cardView)
         CardView mCardView;
 
@@ -79,8 +74,9 @@ public class MultiCityAdapter extends AnimRecyclerViewAdapter<MultiCityAdapter.M
         protected void bind(StockResp.DataBean stock) {
 
             try {
-                mDialogCity.setText(Util.safeText(stock.getStockName()));
-                mDialogTemp.setText(stock.getFormattedPrice());
+                mDialogName.setText(Util.safeText(stock.getStockName()));
+                mDialogRise.setText(stock.getFormattedRise());
+                mDialogPrice.setText(stock.getNewPrice());
             } catch (NullPointerException e) {
                 PLog.e(e.getMessage());
             }
@@ -97,7 +93,7 @@ public class MultiCityAdapter extends AnimRecyclerViewAdapter<MultiCityAdapter.M
 //                });
 
 //            ViewStyleHelper.applyStatus(stock, mCardView);
-            ViewStyleHelper.applyColor(stock, mDialogTemp);
+            ViewStyleHelper.applyColor(stock, mDialogRise);
         }
     }
 

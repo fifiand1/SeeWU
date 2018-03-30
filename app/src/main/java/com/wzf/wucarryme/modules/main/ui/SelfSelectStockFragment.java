@@ -13,7 +13,7 @@ import com.wzf.wucarryme.common.utils.RxUtil;
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil;
 import com.wzf.wucarryme.common.utils.TimeUtil;
 import com.wzf.wucarryme.component.RetrofitSingleton;
-import com.wzf.wucarryme.modules.main.adapter.MultiCityAdapter;
+import com.wzf.wucarryme.modules.main.adapter.MultiStockAdapter;
 import com.wzf.wucarryme.modules.main.domain.StockResp;
 
 import android.os.Bundle;
@@ -43,7 +43,7 @@ public class SelfSelectStockFragment extends BaseFragment {
     @BindView(R.id.empty)
     LinearLayout mLayout;
 
-    private MultiCityAdapter mAdapter;
+    private MultiStockAdapter mAdapter;
     private List<StockResp.DataBean> mStocks;
     private Disposable disposable;
 
@@ -87,10 +87,10 @@ public class SelfSelectStockFragment extends BaseFragment {
 
     private void initView() {
         mStocks = new ArrayList<>();
-        mAdapter = new MultiCityAdapter(mStocks);
+        mAdapter = new MultiStockAdapter(mStocks);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setMultiCityClick(new MultiCityAdapter.onMultiCityClick() {
+        mAdapter.setMultiCityClick(new MultiStockAdapter.onMultiCityClick() {
             @Override
             public void longClick(StockResp.DataBean stock) {
                 new AlertDialog.Builder(getActivity())
@@ -131,7 +131,7 @@ public class SelfSelectStockFragment extends BaseFragment {
             disposable.dispose();
         }
         int autoRefresh = SharedPreferenceUtil.getInstance().getStockAutoRefresh();
-        disposable = Observable.interval(0, 10, TimeUnit.SECONDS)
+        disposable = Observable.interval(0, autoRefresh, TimeUnit.SECONDS)
 
 //            .doOnSubscribe(subscription -> mRefreshLayout.setRefreshing(true))
 //            .map(city -> Util.replaceCity(city.getName()))

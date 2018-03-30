@@ -111,7 +111,7 @@ public class SharedPreferenceUtil {
     }
 
     public int getStockAutoRefresh() {
-        return mPrefs.getInt(AUTO_REFRESH_STOCK, 60);
+        return mPrefs.getInt(AUTO_REFRESH_STOCK, 10);
     }
 
     //当前城市

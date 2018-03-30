@@ -116,7 +116,7 @@ public class StockAdapter extends AnimRecyclerViewAdapter<RecyclerView.ViewHolde
 
         protected void bind(StockResp.DataBean stock) {
             try {
-                tempFlu.setText(stock.getFormattedPrice());
+                tempFlu.setText(stock.getFormattedRise());
                 tempMax.setText(String.format("↑ %s", stock.getMaxPrice()));
                 tempMin.setText(String.format("↓ %s", stock.getMinPrice()));
 

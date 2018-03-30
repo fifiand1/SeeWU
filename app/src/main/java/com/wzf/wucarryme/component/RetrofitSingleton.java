@@ -57,29 +57,29 @@ public class RetrofitSingleton {
     private static void initOkHttp() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         // 缓存 http://www.jianshu.com/p/93153b34310e
-        File cacheFile = new File(C.NET_CACHE);
-        Cache cache = new Cache(cacheFile, 1024 * 1024 * 50);
-        Interceptor cacheInterceptor = chain -> {
-            Request request = chain.request();
-            if (!Util.isNetworkConnected(BaseApplication.getAppContext())) {
-                request = request.newBuilder()
-                    .cacheControl(CacheControl.FORCE_CACHE)
-                    .build();
-            }
-            Response response = chain.proceed(request);
-            Response.Builder newBuilder = response.newBuilder();
-            if (Util.isNetworkConnected(BaseApplication.getAppContext())) {
-                int maxAge = 0;
-                // 有网络时 设置缓存超时时间0个小时
-                newBuilder.header("Cache-Control", "public, max-age=" + maxAge);
-            } else {
-                // 无网络时，设置超时为4周
-                int maxStale = 60 * 60 * 24 * 28;
-                newBuilder.header("Cache-Control", "public, only-if-cached, max-stale=" + maxStale);
-            }
-            return newBuilder.build();
-        };
-        builder.cache(cache).addInterceptor(cacheInterceptor);
+//        File cacheFile = new File(C.NET_CACHE);
+//        Cache cache = new Cache(cacheFile, 1024 * 1024 * 50);
+//        Interceptor cacheInterceptor = chain -> {
+//            Request request = chain.request();
+//            if (!Util.isNetworkConnected(BaseApplication.getAppContext())) {
+//                request = request.newBuilder()
+//                    .cacheControl(CacheControl.FORCE_CACHE)
+//                    .build();
+//            }
+//            Response response = chain.proceed(request);
+//            Response.Builder newBuilder = response.newBuilder();
+//            if (Util.isNetworkConnected(BaseApplication.getAppContext())) {
+//                int maxAge = 0;
+//                // 有网络时 设置缓存超时时间0个小时
+//                newBuilder.header("Cache-Control", "public, max-age=" + maxAge);
+//            } else {
+//                // 无网络时，设置超时为4周
+//                int maxStale = 60 * 60 * 24 * 28;
+//                newBuilder.header("Cache-Control", "public, only-if-cached, max-stale=" + maxStale);
+//            }
+//            return newBuilder.build();
+//        };
+//        builder.cache(cache).addInterceptor(cacheInterceptor);
         if (BuildConfig.DEBUG) {
             builder.addNetworkInterceptor(new StethoInterceptor());
         }
@@ -111,6 +111,7 @@ public class RetrofitSingleton {
                     .delete(new WhereBuilder(CityORM.class).where("name=?", Util.replaceInfo(t.getMessage())));
                 ToastUtil.showShort("错误: " + t.getMessage());
             }
+            throwable.printStackTrace();
             PLog.w(t.getMessage());
         };
     }
@@ -119,7 +120,7 @@ public class RetrofitSingleton {
         String random = String.valueOf(Math.random());
         String codes = "300443,300628,002460,600518,601668,601166,300725,1A0001,2A01,399006";
         String codeTypes = "4621,4621,4614,4353,4353,4353,4621,4352,4608,4608";
-
+        // TODO: 2018/3/30 timeout异常处理
         return sApiService.listStocks(random, codes, codeTypes)
             .flatMap(resp -> {
                 boolean status = resp.isSuccess();
