@@ -62,7 +62,8 @@ public class StringUtil {
 
     public static String genLike(String colName, String bankuai) {
         List<String> list = new ArrayList<>();
-        for(int i=0;(i+2)<=bankuai.length();i+=2) {
+        list.add(bankuai);
+        for (int i = 0; (i + 2) <= bankuai.length(); i += 2) {
             list.add(bankuai.substring(i, i + 2));
         }
         StringBuilder result = new StringBuilder();

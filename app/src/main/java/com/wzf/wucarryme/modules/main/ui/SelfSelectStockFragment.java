@@ -144,9 +144,8 @@ public class SelfSelectStockFragment extends BaseFragment {
                 LogUtil.i(TAG, Thread.currentThread().getName() + " flatMap " + aLong);
                 if (TimeUtil.isKP() || mStocks.size() == 0) {
                     return RetrofitSingleton.getInstance().fetchStocks();
-                } else {
-                    return Observable.just(aLong);
                 }
+                return Observable.just(aLong);
             })
             .compose(RxUtil.fragmentLifecycle(this))
             .doOnNext(stocks -> {

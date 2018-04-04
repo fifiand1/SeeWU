@@ -48,7 +48,7 @@ public class CollectorService extends Service {
     public static final String[] SELL_REG = {"卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%",
         "减掉.*%"};
     public static final String[] SPACE_REG = {"目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%"};
-    public static final String[] CARE_REG = {"领先.*股", "出现冲涨停", "目前具有上涨", "改写了新高"};
+    public static final String[] CARE_REG = {"领先.*股", "出现冲涨停", "目前具有上涨", "目前涨停", "改写了新高"};
 
     public static final String[] collectDate = {};
     public static final String[] collectURL = {};
@@ -248,12 +248,23 @@ public class CollectorService extends Service {
             buySellORM.setLogTime(nowYMDHMSTime);
             buySellORM.setDesc(s);
             try {
-                String like = StringUtil.genLike("CATEGORY_", bankuai);
+
+                String like ="CATEGORY_ like '%"+bankuai+"'";
                 String sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
                     "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
                     "GROUP BY STOCK_NAME ORDER BY c DESC limit 2";
+                LogUtil.d(TAG, "searchMaybeBought() sql = [" + sql + "]");
                 SQLiteDatabase readableDatabase = OrmLite.getInstance().getReadableDatabase();
                 Cursor cursor = readableDatabase.rawQuery(sql, null);
+                if (cursor.getCount() < 1) {
+                    like = StringUtil.genLike("CATEGORY_", bankuai);
+                    sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
+                        "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
+                        "GROUP BY STOCK_NAME ORDER BY c DESC limit 2";
+                    LogUtil.d(TAG, "searchMaybeBought() sql = [" + sql + "]");
+                    readableDatabase = OrmLite.getInstance().getReadableDatabase();
+                    cursor = readableDatabase.rawQuery(sql, null);
+                }
 
                 boolean success = cursor.moveToNext();
                 if (success) {
@@ -302,7 +313,7 @@ public class CollectorService extends Service {
 
             }
             int result = OrmLite.getInstance().insert(list);
-            LogUtil.d(TAG, "add care: " + result);
+            LogUtil.d(TAG, "add care " + category + ": " + result);
 //            long l = OrmLite.getInstance().queryCount(CareORM.class);
 //            LogUtil.d(TAG, "after care: " + l);
         } catch (Exception e) {

@@ -289,7 +289,7 @@ public class StockResp implements Parcelable {
         }
 
         public String getRisePrice() {
-            return risePrice;
+            return risePrice == null ? "0" : risePrice;
         }
 
         public void setRisePrice(String risePrice) {

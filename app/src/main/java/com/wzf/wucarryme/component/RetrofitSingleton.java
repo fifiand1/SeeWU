@@ -1,13 +1,10 @@
 package com.wzf.wucarryme.component;
 
-import java.io.File;
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.litesuits.orm.db.assit.WhereBuilder;
-import com.wzf.wucarryme.BuildConfig;
-import com.wzf.wucarryme.base.BaseApplication;
 import com.wzf.wucarryme.common.C;
 import com.wzf.wucarryme.common.utils.LogUtil;
 import com.wzf.wucarryme.common.utils.RxUtil;
@@ -19,9 +16,6 @@ import com.wzf.wucarryme.modules.main.domain.StockResp;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
-import okhttp3.Cache;
-import okhttp3.CacheControl;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -80,15 +74,27 @@ public class RetrofitSingleton {
 //            return newBuilder.build();
 //        };
 //        builder.cache(cache).addInterceptor(cacheInterceptor);
-        if (BuildConfig.DEBUG) {
-            builder.addNetworkInterceptor(new StethoInterceptor());
-        }
+//        if (BuildConfig.DEBUG) {
+//            builder.addNetworkInterceptor(new StethoInterceptor());
+//        }
+        builder.addInterceptor(chain -> {
+            Request request = chain.request();
+            Response proceed = null;
+            while (proceed == null) {
+                try {
+                    proceed = chain.proceed(request);
+                } catch (SocketTimeoutException e) {
+                    LogUtil.d(TAG, "okhttp [" + e.getMessage() + "], retry...");
+                }
+            }
+            return proceed;
+        });
         //设置超时
-        builder.connectTimeout(10, TimeUnit.SECONDS);
-        builder.readTimeout(10, TimeUnit.SECONDS);
-        builder.writeTimeout(10, TimeUnit.SECONDS);
+        builder.connectTimeout(5, TimeUnit.SECONDS);
+        builder.readTimeout(5, TimeUnit.SECONDS);
+        builder.writeTimeout(5, TimeUnit.SECONDS);
         //错误重连
-        builder.retryOnConnectionFailure(true);
+//        builder.retryOnConnectionFailure(true);
         sOkHttpClient = builder.build();
     }
 
@@ -118,21 +124,25 @@ public class RetrofitSingleton {
 
     public Observable<List<StockResp.DataBean>> fetchStocks() {
         String random = String.valueOf(Math.random());
-        String codes = "300443,300628,002460,600518,601668,601166,300725,1A0001,2A01,399006";
-        String codeTypes = "4621,4621,4614,4353,4353,4353,4621,4352,4608,4608";
-        // TODO: 2018/3/30 timeout异常处理
-        return sApiService.listStocks(random, codes, codeTypes)
-            .flatMap(resp -> {
-                boolean status = resp.isSuccess();
-                if (status) {
-                    LogUtil.i(TAG, resp.toString());
-                    return Observable.just(resp);
-                }
-                return Observable.error(new RuntimeException("出错了/(ㄒoㄒ)/"));
-            })
-            .map(StockResp::getData)
-            .doOnError(RetrofitSingleton::disposeFailureInfo)
-            .compose(RxUtil.io());
+        String codes = "300443,300628,002460,600518,601668,601166,300583,300725,1A0001,2A01,399006";
+        String codeTypes = "4621,4621,4614,4353,4353,4353,4621,4621,4352,4608,4608";
+        try {
+            return sApiService.listStocks(random, codes, codeTypes)
+                .flatMap(resp -> {
+                    boolean status = resp.isSuccess();
+                    if (status) {
+                        LogUtil.i(TAG, resp.toString());
+                        return Observable.just(resp);
+                    }
+                    return Observable.error(new RuntimeException("出错了/(ㄒoㄒ)/"));
+                })
+                .map(StockResp::getData)
+                .doOnError(RetrofitSingleton::disposeFailureInfo)
+                .compose(RxUtil.io());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Observable.error(e);
+        }
     }
 
     public Observable<Version> fetchVersion() {
