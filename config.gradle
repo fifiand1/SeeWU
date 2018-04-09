@@ -1,15 +1,13 @@
 ext {
     android = [
-
-        buildToolsVersion: '26.0.1',
-        supportVersion   : '26.0.2',
+        buildToolsVersion: '27.0.3',
         minSdkVersion    : 19,
-        compileSdkVersion: 26,
-        targetSdkVersion : 25,
+        compileSdkVersion: 27,
+        targetSdkVersion : 27,
         applicationId    : "com.wzf.wucarryme",
-        versionCode      : 34,
-        versionName      : "2.3.1",
-        resConfigs       : "zh",
+        versionCode      : 1,
+        versionName      : "1.0.0",
+        resConfigs       : "zh"
     ]
 //
 //    weather = [
