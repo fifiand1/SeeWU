@@ -1,53 +1,42 @@
 package com.wzf.wucarryme.modules.service
 
-import java.io.IOException
-import java.util.ArrayList
-import java.util.concurrent.TimeUnit
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
-
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
 import com.wzf.wucarryme.common.utils.LogUtil
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.common.utils.StringUtil
+import com.wzf.wucarryme.common.utils.StringUtil.banKuai
 import com.wzf.wucarryme.common.utils.TimeUtil
 import com.wzf.wucarryme.component.NotificationHelper
 import com.wzf.wucarryme.component.OrmLite
 import com.wzf.wucarryme.modules.care.domain.BuySellORM
 import com.wzf.wucarryme.modules.care.domain.CareORM
-
-import android.app.Service
-import android.content.Intent
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.os.IBinder
-import android.util.Log
-
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-
-import com.wzf.wucarryme.common.utils.StringUtil.banKuai
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import java.io.IOException
+import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 //6月2日10:00
 
 class CollectorService : Service() {
-    private val TAG = CollectorService::class.java!!.getSimpleName()
+    private val TAG = CollectorService::class.java.getSimpleName()
     private var mDisposable: Disposable? = null
     private var mIsUnSubscribed = true
 
-    internal var todayDate = ""
-    internal var todayURL = ""
-    internal lateinit var doc: Document
-    internal var storedBought: MutableList<String> = ArrayList()
-    internal var storedSold: MutableList<String> = ArrayList()
-    internal var storedSpace: MutableList<String> = ArrayList()
-    internal var storedCare: MutableList<String> = ArrayList()
-    internal var storedNormal: MutableList<String> = ArrayList()
+    private var todayDate = ""
+    private var todayURL = ""
+    private lateinit var doc: Document
+    private var storedBought: MutableList<String> = ArrayList()
+    private var storedSold: MutableList<String> = ArrayList()
+    private var storedSpace: MutableList<String> = ArrayList()
+    private var storedCare: MutableList<String> = ArrayList()
+    private var storedNormal: MutableList<String> = ArrayList()
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         synchronized(this) {
@@ -100,7 +89,7 @@ class CollectorService : Service() {
         }
 
         LogUtil.i(TAG, "URL " + todayURL)
-        return todayURL!=null
+        return "" != todayURL
     }
 
     private fun jsoupArticle() {
@@ -304,7 +293,7 @@ class CollectorService : Service() {
     }
 
     private fun print(type: String, text: String) {
-        LogUtil.w(TAG, type + " -> " + text)
+        LogUtil.w(TAG, "$type -> $text")
     }
 
     private fun insertExcelSELL(s: String) {
@@ -377,13 +366,13 @@ class CollectorService : Service() {
         val collectDate = arrayOf<String>()
         val collectURL = arrayOf<String>()
         //可能关心的,例如xxxx,xxxx等领先xx股
-        val TYPE_CARE = "CARE"
+        const val TYPE_CARE = "CARE"
         //买入
-        val TYPE_BUY = "BUY"
+        const val TYPE_BUY = "BUY"
         //卖出
-        val TYPE_SELL = "SELL"
+        const val TYPE_SELL = "SELL"
         //持仓
-        val TYPE_POSITION = "POSITION"
+        const val TYPE_POSITION = "POSITION"
     }
 
 }

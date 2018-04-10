@@ -1,16 +1,15 @@
 package com.wzf.wucarryme.modules.main.domain
 
-import java.util.Locale
-
 import android.os.Parcel
 import android.os.Parcelable
+import java.util.*
 
 /**
  * @author wzf
  * @date 2018/2/7
  */
 
-class StockResp protected constructor(`in`: Parcel) : Parcelable {
+class StockResp constructor() : Parcelable {
 
 
     /**
@@ -49,13 +48,12 @@ class StockResp protected constructor(`in`: Parcel) : Parcelable {
      * "totalAmount":"1.82784672E11","hand":null,"shares_per_hand":"1","marketType":"zs","stopFlag":null}]
      */
 
-    //todo bug --> isSuccess返回报文为true 变量是false
+    var success: Boolean = false
+    lateinit var data: List<DataBean>
 
-    var success: Boolean = `in`.readByte().toInt() != 0
-    var data: List<DataBean>
-
-    init {
-        data = `in`.createTypedArrayList(DataBean.CREATOR)
+    constructor(parcel: Parcel) : this() {
+        success = parcel.readByte() != 0.toByte()
+        data = parcel.createTypedArrayList(DataBean.CREATOR)
     }
 
     override fun describeContents(): Int {
@@ -69,7 +67,7 @@ class StockResp protected constructor(`in`: Parcel) : Parcelable {
 
     override fun toString(): String {
         val sb = StringBuilder()
-//        sb.append(success).append("\n")
+        sb.append("success: ").append(success).append(", data size: ").append(data.size).append("\n")
         for (datum in data) {
             sb.append(datum.toString()).append("\n")
         }
@@ -77,6 +75,7 @@ class StockResp protected constructor(`in`: Parcel) : Parcelable {
     }
 
     class DataBean : Parcelable {
+
         /**
          * code : 300628
          * codeType : 4621
@@ -171,57 +170,58 @@ class StockResp protected constructor(`in`: Parcel) : Parcelable {
                     return null
                 }
                 val start = if (risePrice!!.startsWith("-")) "" else "+"
-                return start + String.format(Locale.CHINA, "%.2f", java.lang.Float.parseFloat(if (risePrice == null) "-99.00" else risePrice) * 100) + "%"
+                return start + String.format(Locale.CHINA,
+                    "%.2f",
+                    java.lang.Float.parseFloat(if (risePrice == null) "-99.00" else risePrice) * 100) + "%"
             }
 
-        constructor() {
-
+        constructor(parcel: Parcel) {
+            code = parcel.readString()
+            codeType = parcel.readString()
+            stockName = parcel.readString()
+            newPrice = parcel.readString()
+            risePrice = parcel.readString()
+            prevClose = parcel.readString()
+            open = parcel.readString()
+            maxPrice = parcel.readString()
+            minPrice = parcel.readString()
+            totalHand = parcel.readString()
+            sellPrice5 = parcel.readString()
+            sellPrice4 = parcel.readString()
+            sellPrice3 = parcel.readString()
+            sellPrice2 = parcel.readString()
+            sellPrice1 = parcel.readString()
+            sellCount5 = parcel.readString()
+            sellCount4 = parcel.readString()
+            sellCount3 = parcel.readString()
+            sellCount2 = parcel.readString()
+            sellCount1 = parcel.readString()
+            buyPrice1 = parcel.readString()
+            buyPrice2 = parcel.readString()
+            buyPrice3 = parcel.readString()
+            buyPrice4 = parcel.readString()
+            buyPrice5 = parcel.readString()
+            buyCount1 = parcel.readString()
+            buyCount2 = parcel.readString()
+            buyCount3 = parcel.readString()
+            buyCount4 = parcel.readString()
+            buyCount5 = parcel.readString()
+            upPrice = parcel.readString()
+            downPrice = parcel.readString()
+            weiBi = parcel.readString()
+            weiCha = parcel.readString()
+            inside = parcel.readString()
+            outside = parcel.readString()
+            swing = parcel.readString()
+            totalAmount = parcel.readString()
+            hand = parcel.readString()
+            shares_per_hand = parcel.readString()
+            marketType = parcel.readString()
+            stopFlag = parcel.readString()
         }
 
-        protected constructor(`in`: Parcel) {
-            code = `in`.readString()
-            codeType = `in`.readString()
-            stockName = `in`.readString()
-            newPrice = `in`.readString()
-            risePrice = `in`.readString()
-            prevClose = `in`.readString()
-            open = `in`.readString()
-            maxPrice = `in`.readString()
-            minPrice = `in`.readString()
-            totalHand = `in`.readString()
-            sellPrice5 = `in`.readString()
-            sellPrice4 = `in`.readString()
-            sellPrice3 = `in`.readString()
-            sellPrice2 = `in`.readString()
-            sellPrice1 = `in`.readString()
-            sellCount5 = `in`.readString()
-            sellCount4 = `in`.readString()
-            sellCount3 = `in`.readString()
-            sellCount2 = `in`.readString()
-            sellCount1 = `in`.readString()
-            buyPrice1 = `in`.readString()
-            buyPrice2 = `in`.readString()
-            buyPrice3 = `in`.readString()
-            buyPrice4 = `in`.readString()
-            buyPrice5 = `in`.readString()
-            buyCount1 = `in`.readString()
-            buyCount2 = `in`.readString()
-            buyCount3 = `in`.readString()
-            buyCount4 = `in`.readString()
-            buyCount5 = `in`.readString()
-            upPrice = `in`.readString()
-            downPrice = `in`.readString()
-            weiBi = `in`.readString()
-            weiCha = `in`.readString()
-            inside = `in`.readString()
-            outside = `in`.readString()
-            swing = `in`.readString()
-            totalAmount = `in`.readString()
-            hand = `in`.readString()
-            shares_per_hand = `in`.readString()
-            marketType = `in`.readString()
-            stopFlag = `in`.readString()
-        }
+        constructor()
+
 
         override fun describeContents(): Int {
             return 0
@@ -330,30 +330,26 @@ class StockResp protected constructor(`in`: Parcel) : Parcelable {
             return result
         }
 
-        companion object {
-
-            val CREATOR: Parcelable.Creator<DataBean> = object : Parcelable.Creator<DataBean> {
-                override fun createFromParcel(`in`: Parcel): DataBean {
-                    return DataBean(`in`)
-                }
-
-                override fun newArray(size: Int): Array<DataBean?> {
-                    return arrayOfNulls(size)
-                }
-            }
-        }
-    }
-
-    companion object {
-
-        val CREATOR: Parcelable.Creator<StockResp> = object : Parcelable.Creator<StockResp> {
-            override fun createFromParcel(`in`: Parcel): StockResp {
-                return StockResp(`in`)
+        companion object CREATOR : Parcelable.Creator<DataBean> {
+            override fun createFromParcel(parcel: Parcel): DataBean {
+                return DataBean(parcel)
             }
 
-            override fun newArray(size: Int): Array<StockResp?> {
+            override fun newArray(size: Int): Array<DataBean?> {
                 return arrayOfNulls(size)
             }
         }
+
     }
+
+    companion object CREATOR : Parcelable.Creator<StockResp> {
+        override fun createFromParcel(parcel: Parcel): StockResp {
+            return StockResp(parcel)
+        }
+
+        override fun newArray(size: Int): Array<StockResp?> {
+            return arrayOfNulls(size)
+        }
+    }
+
 }

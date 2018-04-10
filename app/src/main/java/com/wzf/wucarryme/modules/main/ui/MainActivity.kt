@@ -1,17 +1,5 @@
 package com.wzf.wucarryme.modules.main.ui
 
-import com.wzf.wucarryme.R
-import com.wzf.wucarryme.base.BaseActivity
-import com.wzf.wucarryme.common.C
-import com.wzf.wucarryme.common.utils.CircularAnimUtil
-import com.wzf.wucarryme.common.utils.RxDrawer
-import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
-import com.wzf.wucarryme.modules.about.ui.AboutActivity
-import com.wzf.wucarryme.modules.city.ui.ChoiceCityActivity
-import com.wzf.wucarryme.modules.main.adapter.HomePagerAdapter
-import com.wzf.wucarryme.modules.service.CollectorService
-import com.wzf.wucarryme.modules.setting.ui.SettingActivity
-
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -26,8 +14,18 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
-
 import butterknife.BindView
+import com.wzf.wucarryme.R
+import com.wzf.wucarryme.base.BaseActivity
+import com.wzf.wucarryme.common.C
+import com.wzf.wucarryme.common.utils.CircularAnimUtil
+import com.wzf.wucarryme.common.utils.RxDrawer
+import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
+import com.wzf.wucarryme.modules.about.ui.AboutActivity
+import com.wzf.wucarryme.modules.city.ui.ChoiceCityActivity
+import com.wzf.wucarryme.modules.main.adapter.HomePagerAdapter
+import com.wzf.wucarryme.modules.service.CollectorService
+import com.wzf.wucarryme.modules.setting.ui.SettingActivity
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -71,23 +69,23 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      */
     private fun initView() {
         setSupportActionBar(mToolbar)
-        mFab!!.setOnClickListener { showShareDialog() }
+        mFab.setOnClickListener { showShareDialog() }
         val mAdapter = HomePagerAdapter(supportFragmentManager)
         mMainFragment = MainFragment()
         mMultiCityFragment = SelfSelectStockFragment()
         mAdapter.addTab(mMainFragment!!, "")
         mAdapter.addTab(mMultiCityFragment!!, "")
-        mViewPager!!.adapter = mAdapter
+        mViewPager.adapter = mAdapter
         val fabVisibilityChangedListener = FabVisibilityChangedListener()
-        mTabLayout!!.setupWithViewPager(mViewPager, false)
-        mViewPager!!.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+        mTabLayout.setupWithViewPager(mViewPager, false)
+        mViewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
             override fun onPageSelected(position: Int) {
-                if (mFab!!.isShown) {
+                if (mFab.isShown) {
                     fabVisibilityChangedListener.position = position
-                    mFab!!.hide(fabVisibilityChangedListener)
+                    mFab.hide(fabVisibilityChangedListener)
                 } else {
                     changeFabState(position)
-                    mFab!!.show()
+                    mFab.show()
                 }
             }
         })
@@ -107,14 +105,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * 初始化抽屉
      */
     private fun initDrawer() {
-        if (mNavView != null) {
-            mNavView!!.setNavigationItemSelectedListener(this)
-            mNavView!!.inflateHeaderView(R.layout.nav_header_main)
-            val toggle = ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open,
-                    R.string.navigation_drawer_close)
-            mDrawerLayout!!.addDrawerListener(toggle)
-            toggle.syncState()
-        }
+        mNavView.setNavigationItemSelectedListener(this)
+        mNavView.inflateHeaderView(R.layout.nav_header_main)
+        val toggle = ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close)
+        mDrawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
     }
 
     /**
@@ -127,13 +123,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        RxDrawer.close(this.mDrawerLayout!!)
+        RxDrawer.close(this.mDrawerLayout)
                 .doOnNext {
                     when (item.itemId) {
-                        R.id.nav_set -> SettingActivity.launch(this@MainActivity)
-                        R.id.nav_about -> AboutActivity.launch(this@MainActivity)
-                        R.id.nav_city -> ChoiceCityActivity.launch(this@MainActivity)
-                        R.id.nav_multi_cities -> mViewPager!!.currentItem = 1
+                        R.id.nav_set          -> SettingActivity.launch(this@MainActivity)
+                        R.id.nav_about        -> AboutActivity.launch(this@MainActivity)
+                        R.id.nav_city         -> ChoiceCityActivity.launch(this@MainActivity)
+                        R.id.nav_multi_cities -> mViewPager.currentItem = 1
                     }
                 }
                 .subscribe()
@@ -142,19 +138,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun changeFabState(position: Int) {
         if (position == 1) {
-            mFab!!.setImageResource(R.drawable.ic_add_24dp)
-            mFab!!.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color
+            mFab.setImageResource(R.drawable.ic_add_24dp)
+            mFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color
                     .colorPrimary))
-            mFab!!.setOnClickListener {
+            mFab.setOnClickListener {
                 val intent = Intent(this@MainActivity, ChoiceCityActivity::class.java)
                 intent.putExtra(C.MULTI_CHECK, true)
-                CircularAnimUtil.startActivity(this@MainActivity, intent, mFab!!, R.color.colorPrimary)
+                CircularAnimUtil.startActivity(this@MainActivity, intent, mFab, R.color.colorPrimary)
             }
         } else {
-            mFab!!.setImageResource(R.drawable.ic_favorite)
-            mFab!!.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color
+            mFab.setImageResource(R.drawable.ic_favorite)
+            mFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color
                     .colorAccent))
-            mFab!!.setOnClickListener { showShareDialog() }
+            mFab.setOnClickListener { showShareDialog() }
         }
     }
 
@@ -163,8 +159,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onBackPressed() {
-        if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout!!.closeDrawer(GravityCompat.START)
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }

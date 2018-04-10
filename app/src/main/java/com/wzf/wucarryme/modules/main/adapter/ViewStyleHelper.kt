@@ -1,12 +1,10 @@
 package com.wzf.wucarryme.modules.main.adapter
 
-import com.wzf.wucarryme.R
-import com.wzf.wucarryme.modules.main.domain.StockResp
-
 import android.support.v4.content.ContextCompat
-import android.util.SparseIntArray
 import android.view.View
 import android.widget.TextView
+import com.wzf.wucarryme.R
+import com.wzf.wucarryme.modules.main.domain.StockResp
 
 object ViewStyleHelper {
 
@@ -39,8 +37,8 @@ object ViewStyleHelper {
         //        view.setBackground(ContextCompat.getDrawable(view.getContext(), mipRes));
     }
 
-    internal fun applyColor(stock: StockResp.DataBean, view: TextView) {
-        val rise = java.lang.Float.parseFloat(stock.risePrice)
+    internal fun applyColor(stock: StockResp.DataBean?, view: TextView) {
+        val rise = java.lang.Float.parseFloat(stock!!.risePrice!!)
         if (rise > 0) {
             view.setTextColor(ContextCompat.getColor(view.context, R.color.price_rise))
         } else if (rise < 0) {

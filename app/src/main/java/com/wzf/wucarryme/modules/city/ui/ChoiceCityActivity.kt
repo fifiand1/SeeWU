@@ -1,7 +1,15 @@
 package com.wzf.wucarryme.modules.city.ui
 
-import java.util.ArrayList
-
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.ProgressBar
 import com.wzf.wucarryme.R
 import com.wzf.wucarryme.base.ToolbarActivity
 import com.wzf.wucarryme.common.C
@@ -14,31 +22,12 @@ import com.wzf.wucarryme.component.RxBus
 import com.wzf.wucarryme.modules.city.adapter.CityAdapter
 import com.wzf.wucarryme.modules.city.domain.City
 import com.wzf.wucarryme.modules.city.domain.Province
-import com.wzf.wucarryme.modules.main.domain.ChangeCityEvent
 import com.wzf.wucarryme.modules.main.domain.CityORM
 import com.wzf.wucarryme.modules.main.domain.SelfSelectUpdateEvent
 import com.wzf.wucarryme.modules.main.domain.StockResp
-
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.ProgressBar
-
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.FlowableEmitter
-import io.reactivex.FlowableOnSubscribe
+import io.reactivex.*
 import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
+import java.util.*
 
 class ChoiceCityActivity : ToolbarActivity() {
 
@@ -86,8 +75,8 @@ class ChoiceCityActivity : ToolbarActivity() {
     }
 
     private fun initView() {
-        mRecyclerView = findViewById(R.id.recyclerview) as RecyclerView
-        mProgressBar = findViewById(R.id.progressBar) as ProgressBar
+        mRecyclerView = findViewById(R.id.recyclerview)
+        mProgressBar = findViewById(R.id.progressBar)
         if (mProgressBar != null) {
             mProgressBar!!.visibility = View.VISIBLE
         }
@@ -154,11 +143,7 @@ class ChoiceCityActivity : ToolbarActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.multi_check) {
-            if (isChecked) {
-                item.isChecked = false
-            } else {
-                item.isChecked = true
-            }
+            item.isChecked = !isChecked
             isChecked = item.isChecked
         }
         return super.onOptionsItemSelected(item)
@@ -208,8 +193,8 @@ class ChoiceCityActivity : ToolbarActivity() {
         AlertDialog.Builder(this)
                 .setTitle("多城市管理模式")
                 .setMessage("您现在是多城市管理模式,直接点击即可新增城市.如果暂时不需要添加," + "在右上选项中关闭即可像往常一样操作.\n因为 api 次数限制的影响,多城市列表最多三个城市.(๑′ᴗ‵๑)")
-                .setPositiveButton("明白") { dialog, which -> dialog.dismiss() }
-                .setNegativeButton("不再提示") { dialog, which -> SharedPreferenceUtil.instance.putBoolean("Tips", false) }
+            .setPositiveButton("明白") { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton("不再提示") { _, _ -> SharedPreferenceUtil.instance.putBoolean("Tips", false) }
                 .show()
     }
 
@@ -220,8 +205,8 @@ class ChoiceCityActivity : ToolbarActivity() {
 
     companion object {
 
-        val LEVEL_PROVINCE = 1
-        val LEVEL_CITY = 2
+        const val LEVEL_PROVINCE = 1
+        const val LEVEL_CITY = 2
 
         fun launch(context: Context) {
             context.startActivity(Intent(context, ChoiceCityActivity::class.java))

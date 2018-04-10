@@ -1,14 +1,5 @@
 package com.wzf.wucarryme.modules.main.adapter
 
-import com.wzf.wucarryme.R
-import com.wzf.wucarryme.base.BaseViewHolder
-import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
-import com.wzf.wucarryme.common.utils.Util
-import com.wzf.wucarryme.component.AnimRecyclerViewAdapter
-import com.wzf.wucarryme.component.ImageLoader
-import com.wzf.wucarryme.component.PLog
-import com.wzf.wucarryme.modules.main.domain.StockResp
-
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -17,8 +8,16 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-
 import butterknife.BindView
+import com.wzf.wucarryme.R
+import com.wzf.wucarryme.base.BaseViewHolder
+import com.wzf.wucarryme.common.utils.LogUtil
+import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
+import com.wzf.wucarryme.common.utils.Util
+import com.wzf.wucarryme.component.AnimRecyclerViewAdapter
+import com.wzf.wucarryme.component.ImageLoader
+import com.wzf.wucarryme.component.PLog
+import com.wzf.wucarryme.modules.main.domain.StockResp
 
 class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAdapter<RecyclerView.ViewHolder>() {
 
@@ -41,13 +40,13 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         mContext = parent.context
-        when (viewType) {
-            TYPE_ONE -> return NowStockViewHolder(
-                    LayoutInflater.from(mContext).inflate(R.layout.item_temperature, parent, false))
-//            TYPE_TWO -> return HoursWeatherViewHolder(
-//                    LayoutInflater.from(mContext).inflate(R.layout.item_hour_info, parent, false))
-            else -> return HoursWeatherViewHolder(
-                    LayoutInflater.from(mContext).inflate(R.layout.item_hour_info, parent, false))
+        return when (viewType) {
+            TYPE_ONE -> NowStockViewHolder(
+                LayoutInflater.from(mContext).inflate(R.layout.item_stock_detail, parent, false))
+        //            TYPE_TWO -> return HoursWeatherViewHolder(
+        //                    LayoutInflater.from(mContext).inflate(R.layout.item_hour_info, parent, false))
+            else     -> HoursWeatherViewHolder(
+                LayoutInflater.from(mContext).inflate(R.layout.item_hour_info, parent, false))
         }
     }
 
@@ -56,7 +55,7 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
         when (itemType) {
             TYPE_ONE -> (holder as NowStockViewHolder).bind(mStock)
             TYPE_TWO -> (holder as HoursWeatherViewHolder).bind(mStock)
-            else -> {
+            else     -> {
             }
         }
         if (SharedPreferenceUtil.instance.mainAnim) {
@@ -75,29 +74,29 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
 
         @BindView(R.id.weather_icon)
         lateinit var weatherIcon: ImageView
-        @BindView(R.id.temp_flu)
-        lateinit var tempFlu: TextView
-        @BindView(R.id.temp_max)
-        lateinit var tempMax: TextView
+        @BindView(R.id.stock_flu)
+        lateinit var stockFlu: TextView
+        @BindView(R.id.stock_max)
+        lateinit var stockMax: TextView
 
-        @BindView(R.id.temp_min)
-        lateinit var tempMin: TextView
+        @BindView(R.id.stock_min)
+        lateinit var stockMin: TextView
 
-        @BindView(R.id.temp_pm)
-        lateinit var tempPm: TextView
-        @BindView(R.id.temp_quality)
-        lateinit var tempQuality: TextView
+        @BindView(R.id.stock_pm)
+        lateinit var stockPm: TextView
+        @BindView(R.id.stock_now)
+        lateinit var stockNewPrice: TextView
 
         public override fun bind(dataBean: StockResp.DataBean) = try {
-            tempFlu.text = dataBean.formattedRise
-            tempMax.text = String.format("↑ %s", dataBean.maxPrice)
-            tempMin.text = String.format("↓ %s", dataBean.minPrice)
+            stockFlu.text = dataBean.formattedRise
+            stockMax.text = String.format("↑ %s", dataBean.maxPrice)
+            stockMin.text = String.format("↓ %s", dataBean.minPrice)
 
-            tempPm.text = String.format("开: %s ", Util.safeText(dataBean.open!!))
-            tempQuality.text = String.format("现：%s", Util.safeText(dataBean.newPrice!!))
+            stockPm.text = String.format("开: %s ", Util.safeText(dataBean.open))
+            stockNewPrice.text = String.format("现：%s", Util.safeText(dataBean.newPrice))
             ImageLoader.load(itemView.context,
-                    SharedPreferenceUtil.instance.getInt("stock.now.cond.txt", R.mipmap.none),
-                    weatherIcon)
+                SharedPreferenceUtil.instance.getInt("stock.now.cond.txt", R.mipmap.none),
+                weatherIcon)
         } catch (e: Exception) {
             PLog.e(TAG, e.toString())
         }
@@ -106,7 +105,10 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
     /**
      * 买卖
      */
-    private inner class HoursWeatherViewHolder internal constructor(itemView: View) : BaseViewHolder<StockResp.DataBean>(itemView) {
+    private inner class HoursWeatherViewHolder internal constructor(itemView: View) :
+        BaseViewHolder<StockResp.DataBean>(itemView) {
+
+
         private val itemHourInfoLayout: LinearLayout = itemView.findViewById(R.id.item_hour_info_linearlayout)
         private val mBuyPrice = arrayOfNulls<TextView>(5)
         private val mBuyCount = arrayOfNulls<TextView>(5)
@@ -128,6 +130,7 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
         public override fun bind(dataBean: StockResp.DataBean) {
 
             try {
+                LogUtil.i(TAG, "HoursWeatherViewHolder bind: $dataBean")
                 for (i in 0..4) {
                     //s.subString(s.length-3,s.length);
                     //第一个参数是开始截取的位置，第二个是结束位置。

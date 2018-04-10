@@ -1,14 +1,11 @@
 package com.wzf.wucarryme.base
 
-import java.io.File
-
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
-
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.app.AppCompatDelegate
-
 import butterknife.ButterKnife
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
+import java.io.File
 
 abstract class BaseActivity : RxAppCompatActivity() {
 

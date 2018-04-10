@@ -3,7 +3,6 @@ package com.wzf.wucarryme.base
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
-import android.support.v7.app.ActionBar
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.animation.DecelerateInterpolator
@@ -11,22 +10,21 @@ import com.wzf.wucarryme.R
 
 abstract class ToolbarActivity : BaseActivity() {
 
-    protected var mAppBar: AppBarLayout? = null
+    private var mAppBar: AppBarLayout? = null
     var toolbar: Toolbar? = null
-        protected set
-    protected var mIsHidden = false
+    private var mIsHidden = false
 
-    fun onToolbarClick() {}
+    private fun onToolbarClick() {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAppBar = findViewById(R.id.appbar_layout) as AppBarLayout
-        toolbar = findViewById(R.id.toolbar) as Toolbar
+        mAppBar = findViewById(R.id.appbar_layout)
+        toolbar = findViewById(R.id.toolbar)
         if (toolbar == null || mAppBar == null) {
             throw IllegalStateException(
-                    "The subclass of ToolbarActivity must contain a toolbar.")
+                "The subclass of ToolbarActivity must contain a toolbar.")
         }
-        toolbar!!.setOnClickListener { v -> onToolbarClick() }
+        toolbar!!.setOnClickListener { onToolbarClick() }
         setSupportActionBar(toolbar)
         if (canBack()) {
             val actionBar = supportActionBar
@@ -56,9 +54,9 @@ abstract class ToolbarActivity : BaseActivity() {
 
     protected fun hideOrShowToolbar() {
         mAppBar!!.animate()
-                .translationY((if (mIsHidden) 0 else -mAppBar!!.height).toFloat())
-                .setInterpolator(DecelerateInterpolator(2f))
-                .start()
+            .translationY((if (mIsHidden) 0 else -mAppBar!!.height).toFloat())
+            .setInterpolator(DecelerateInterpolator(2f))
+            .start()
         mIsHidden = !mIsHidden
     }
 

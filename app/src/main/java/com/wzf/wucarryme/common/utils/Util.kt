@@ -1,13 +1,12 @@
 package com.wzf.wucarryme.common.utils
 
-import java.io.Closeable
-import java.io.IOException
-
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.ConnectivityManager
 import android.text.TextUtils
+import java.io.Closeable
+import java.io.IOException
 
 object Util {
     private val CODE_TYPE_60 = "4353"
@@ -28,8 +27,8 @@ object Util {
         return false
     }
 
-    fun safeText(msg: String): String {
-        return if (TextUtils.isEmpty(msg)) "" else msg
+    fun safeText(msg: String?): String {
+        return if (TextUtils.isEmpty(msg)) "" else msg!!
     }
 
     /**
@@ -63,7 +62,7 @@ object Util {
 
     fun replaceInfo(city: String?): String {
         var city = city
-        city = safeText(city!!).replace("API没有", "")
+        city = safeText(city).replace("API没有", "")
         return city
     }
 

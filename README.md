@@ -37,18 +37,19 @@ fork from就看天气 ——是一款遵循 **Material Design** 风格的只看�
 - [x] spaceChange-->LocalNotification
 - [x] collector service(jsoup)
 - [x] 通知栏提醒
-- [ ] 改成kotlin
+- [x] 改成kotlin
+- [ ] 股票当日详情刷新
 - [ ] UI(直播仓位变化)
 - [ ] UI(直播关注个股)
 - [ ] UI(直播内容)
 - [x] UI(自选实时行情)
 - [ ] UI(历史仓位变化图表,对比3指数)
 - [ ] UI(关注个股查询)
+- [ ] 引导页面
 - [ ] 管理自选股
 - [ ] widget桌面小部件(stock)
-- [ ] 数据去中心化同步
 - [ ] 更好，更多的ICONS
-- [ ] 引导页面
+- [ ] 数据去中心化同步
 
 
 ----

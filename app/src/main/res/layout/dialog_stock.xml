@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
+    android:id="@+id/weather_dialog_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/weather_dialog_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp">
@@ -39,9 +39,11 @@
         android:layout_marginStart="8dp"
         android:textColor="@color/primary_text"
         android:textSize="18sp"
+        android:transitionName="risePrice"
         android:typeface="monospace"
         app:layout_constraintBaseline_toBaselineOf="@+id/dialog_name"
         app:layout_constraintStart_toEndOf="@+id/dialog_name"
+        tools:targetApi="lollipop"
         tools:text="12345"/>
 
 </android.support.constraint.ConstraintLayout>

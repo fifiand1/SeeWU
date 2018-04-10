@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.functions.Consumer
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -40,33 +41,25 @@ class RetrofitSingleton private constructor() {
         val random = Math.random().toString()
         val codes = "300443,300628,002460,600518,601668,601166,300583,300725,1A0001,2A01,399006"
         val codeTypes = "4621,4621,4614,4353,4353,4353,4621,4621,4352,4608,4608"
-        try {
-            return sApiService.listStocks(random, codes, codeTypes)
-//                    .flatMap(Function<StockResp, ObservableSource<StockResp>> { resp ->
-//                        LogUtil.i(TAG, resp.toString())
-//                        val status = resp.success
-////                        if (status) {
-//                            return@Function Observable.just(resp)
-////                        }
-////                        return@Function Observable.error(RuntimeException("出错了/(ㄒoㄒ)/"))
-//                    })
-                    .map { stockResp ->
-                        LogUtil.i(TAG, stockResp.toString())
-                        stockResp.data
-                    }
-                    .doOnError { t -> disposeFailureInfo(t) }
-                    .compose(RxUtil.io())
+        return try {
+            sApiService.listStocks(random, codes, codeTypes)
+                .map { stockResp ->
+                    LogUtil.i(TAG, stockResp.toString())
+                    stockResp.data
+                }
+                .doOnError { t -> disposeFailureInfo(t) }
+                .compose(RxUtil.io())
         } catch (e: Exception) {
             e.printStackTrace()
-            return Observable.error(e)
+            Observable.error(e)
         }
 
     }
 
     fun fetchVersion(): Observable<Version> {
         return sApiService.mVersionAPI(C.API_TOKEN)
-                .doOnError { disposeFailureInfo(it) }
-                .compose(RxUtil.io())
+            .doOnError { disposeFailureInfo(it) }
+            .compose(RxUtil.io())
     }
 
     companion object {
@@ -75,6 +68,7 @@ class RetrofitSingleton private constructor() {
         private lateinit var sApiService: FounderService
         private lateinit var sRetrofit: Retrofit
         private lateinit var sOkHttpClient: OkHttpClient
+        private var totalReconnect: Int = 0
 
         val instance: RetrofitSingleton
             get() = SingletonHolder.INSTANCE
@@ -118,40 +112,41 @@ class RetrofitSingleton private constructor() {
                         val mediaType = proceed.body()!!.contentType()
                         LogUtil.d(TAG, "okhttp body: $content")
                         return@addInterceptor proceed.newBuilder()
-                                .body(okhttp3.ResponseBody.create(mediaType, content))
-                                .build()
+                            .body(ResponseBody.create(mediaType, content))
+                            .build()
                     } catch (e: SocketTimeoutException) {
-                        LogUtil.d(TAG, "okhttp [" + e.message + "], retry...")
+                        LogUtil.d(TAG, "okhttp [" + e.message + "], rej8try..." + (++totalReconnect))
                     }
 
                 }
                 proceed
             }
             //设置超时
-            builder.connectTimeout(3, TimeUnit.SECONDS)
-            builder.readTimeout(3, TimeUnit.SECONDS)
-            builder.writeTimeout(3, TimeUnit.SECONDS)
+            builder.connectTimeout(5, TimeUnit.SECONDS)
+            builder.readTimeout(5, TimeUnit.SECONDS)
+            builder.writeTimeout(5, TimeUnit.SECONDS)
             //错误重连
-            //        builder.retryOnConnectionFailure(true);
+            // builder.retryOnConnectionFailure(true);
             sOkHttpClient = builder.build()
         }
 
         private fun initRetrofit() {
             sRetrofit = Retrofit.Builder()
-                    .baseUrl(FounderService.HOST)
-                    .client(sOkHttpClient)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build()
+                .baseUrl(FounderService.HOST)
+                .client(sOkHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
         }
 
         private fun disposeFailureInfo(t: Throwable): Consumer<Throwable> {
             return Consumer { throwable ->
                 if (t.toString().contains("GaiException") || t.toString().contains("SocketTimeoutException") ||
-                        t.toString().contains("UnknownHostException")) {
+                    t.toString().contains("UnknownHostException")) {
                     ToastUtil.showShort("网络问题")
                 } else if (t.toString().contains("API没有")) {
-                    OrmLite.getInstance()!!.delete(WhereBuilder(CityORM::class.java).where("name=?", Util.replaceInfo(t.message)))
+                    OrmLite.getInstance()!!.delete(WhereBuilder(CityORM::class.java).where("name=?",
+                        Util.replaceInfo(t.message)))
                     ToastUtil.showShort("错误: " + t.message)
                 }
                 throwable.printStackTrace()

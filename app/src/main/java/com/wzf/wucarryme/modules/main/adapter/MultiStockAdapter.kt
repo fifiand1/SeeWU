@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import butterknife.BindView
-
 import com.wzf.wucarryme.R
 import com.wzf.wucarryme.base.BaseViewHolder
+import com.wzf.wucarryme.common.utils.Util
 import com.wzf.wucarryme.component.AnimRecyclerViewAdapter
 import com.wzf.wucarryme.component.PLog
-import com.wzf.wucarryme.common.utils.Util
 import com.wzf.wucarryme.modules.main.domain.StockResp
 
 internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean>) : AnimRecyclerViewAdapter<MultiStockAdapter.MultiStockViewHolder>() {
@@ -27,7 +26,9 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MultiStockViewHolder {
         mContext = parent.context
-        return MultiStockViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_multi_stock, parent, false))
+        return MultiStockViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_multi_stock,
+            parent,
+            false))
     }
 
     override fun onBindViewHolder(holder: MultiStockViewHolder, position: Int) {
@@ -37,7 +38,10 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
             mMultiCityClick!!.longClick(mStockList[holder.adapterPosition])
             true
         }
-        holder.itemView.setOnClickListener { mMultiCityClick!!.click(mStockList[holder.adapterPosition]) }
+        holder.itemView.setOnClickListener {
+            mMultiCityClick!!.click(mStockList[holder.adapterPosition],
+                holder.mDialogRise)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -58,7 +62,7 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
         public override fun bind(dataBean: StockResp.DataBean) {
 
             try {
-                mDialogName.text = Util.safeText(dataBean.stockName!!)
+                mDialogName.text = Util.safeText(dataBean.stockName)
                 mDialogRise.text = dataBean.formattedRise
                 mDialogPrice.text = dataBean.newPrice
             } catch (e: NullPointerException) {
@@ -84,6 +88,6 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
     interface OnMultiStockClick {
         fun longClick(dataBean: StockResp.DataBean)
 
-        fun click(dataBean: StockResp.DataBean)
+        fun click(dataBean: StockResp.DataBean, clicked: View)
     }
 }

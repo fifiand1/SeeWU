@@ -1,16 +1,5 @@
 package com.wzf.wucarryme.modules.main.ui
 
-import com.wzf.wucarryme.R
-import com.wzf.wucarryme.base.BaseFragment
-import com.wzf.wucarryme.common.utils.RxUtil
-import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
-import com.wzf.wucarryme.common.utils.ToastUtil
-import com.wzf.wucarryme.component.RetrofitSingleton
-import com.wzf.wucarryme.component.RxBus
-import com.wzf.wucarryme.modules.main.adapter.StockAdapter
-import com.wzf.wucarryme.modules.main.domain.ChangeCityEvent
-import com.wzf.wucarryme.modules.main.domain.StockResp
-
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
@@ -21,9 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.wzf.wucarryme.R
+import com.wzf.wucarryme.base.BaseFragment
+import com.wzf.wucarryme.common.utils.RxUtil
+import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
+import com.wzf.wucarryme.common.utils.ToastUtil
+import com.wzf.wucarryme.component.RetrofitSingleton
+import com.wzf.wucarryme.component.RxBus
+import com.wzf.wucarryme.modules.main.adapter.StockAdapter
+import com.wzf.wucarryme.modules.main.domain.ChangeCityEvent
+import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 
@@ -59,8 +57,8 @@ class MainFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        load()
+//        initView()
+//        load()
         //        VersionUtil.checkVersion(getActivity());
     }
 
@@ -72,42 +70,40 @@ class MainFragment : BaseFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter({ isVisible })
                 .doOnNext({
-                    mRefreshLayout!!.isRefreshing = true
+                    mRefreshLayout.isRefreshing = true
                     load()
                 })
                 .subscribe()
     }
 
     private fun initView() {
-        if (mRefreshLayout != null) {
-            mRefreshLayout!!.setColorSchemeResources(android.R.color.holo_blue_bright,
+        mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                     android.R.color.holo_green_light,
                     android.R.color.holo_orange_light,
                     android.R.color.holo_red_light)
-            mRefreshLayout!!.setOnRefreshListener { mRefreshLayout!!.postDelayed({ this.load() }, 1000) }
-        }
+        mRefreshLayout.setOnRefreshListener { mRefreshLayout.postDelayed({ this.load() }, 1000) }
 
-        mRecyclerView!!.layoutManager = LinearLayoutManager(activity)
+        mRecyclerView.layoutManager = LinearLayoutManager(activity)
         mAdapter = StockAdapter(mWeather)
-        mRecyclerView!!.adapter = mAdapter
+        mRecyclerView.adapter = mAdapter
     }
 
     private fun load() {
         if (1 == 1) {
-            mRefreshLayout!!.isRefreshing = false
+            mRefreshLayout.isRefreshing = false
             return
         }
         fetchDataByNetWork()
-                .doOnSubscribe { mRefreshLayout!!.isRefreshing = true }
+            .doOnSubscribe { mRefreshLayout.isRefreshing = true }
                 .doOnError {
-                    mIvError!!.visibility = View.VISIBLE
-                    mRecyclerView!!.visibility = View.GONE
+                    mIvError.visibility = View.VISIBLE
+                    mRecyclerView.visibility = View.GONE
                     SharedPreferenceUtil.instance.cityName = "北京"
                     safeSetTitle("找不到城市啦")
                 }
                 .doOnNext {
-                    mIvError!!.visibility = View.GONE
-                    mRecyclerView!!.visibility = View.VISIBLE
+                    mIvError.visibility = View.GONE
+                    mRecyclerView.visibility = View.VISIBLE
 
                     //                mWeather.status = weather.status;
                     //                mWeather.aqi = weather.aqi;

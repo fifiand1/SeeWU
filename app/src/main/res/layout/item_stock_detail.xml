@@ -27,7 +27,7 @@
             tools:src="@mipmap/none"/>
 
         <LinearLayout
-            android:id="@+id/linear_temp"
+            android:id="@+id/linear_stock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -36,27 +36,29 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/temp_flu"
+                android:id="@+id/stock_flu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/temp_layout"
-                android:textSize="50sp"/>
+                android:layout_toLeftOf="@+id/stock_layout"
+                android:textSize="50sp"
+                android:transitionName="risePrice"
+                tools:targetApi="lollipop"/>
 
             <LinearLayout
-                android:id="@+id/temp_layout"
+                android:id="@+id/stock_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/temp_max"
+                    android:id="@+id/stock_max"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#BDBDBD"
                     android:textSize="18sp"/>
 
                 <TextView
-                    android:id="@+id/temp_min"
+                    android:id="@+id/stock_min"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
@@ -69,13 +71,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/linear_temp"
+            android:layout_below="@+id/linear_stock"
             android:layout_marginBottom="6dp"
             android:layout_marginTop="24dp"
             android:gravity="right">
 
             <TextView
-                android:id="@+id/temp_pm"
+                android:id="@+id/stock_pm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="12dp"
@@ -83,7 +85,7 @@
                 android:textSize="12sp"/>
 
             <TextView
-                android:id="@+id/temp_quality"
+                android:id="@+id/stock_now"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#BDBDBD"
