@@ -1,6 +1,7 @@
 package com.wzf.wucarryme.modules.main.adapter
 
 import android.content.Context
+import android.support.v4.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import com.wzf.wucarryme.base.BaseViewHolder
 import com.wzf.wucarryme.common.utils.Util
 import com.wzf.wucarryme.component.AnimRecyclerViewAdapter
 import com.wzf.wucarryme.component.PLog
+import com.wzf.wucarryme.component.ViewStyleHelper
 import com.wzf.wucarryme.modules.main.domain.StockResp
 
 internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean>) : AnimRecyclerViewAdapter<MultiStockAdapter.MultiStockViewHolder>() {
@@ -39,8 +41,12 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
             true
         }
         holder.itemView.setOnClickListener {
+            val risePair: Pair<View, String> = Pair(holder.mDialogRise, "risePrice")
+            val newPair: Pair<View, String> = Pair(holder.mDialogPrice, "newPrice")
+            val namePair: Pair<View, String> = Pair(holder.mDialogName, "stockName")
+
             mMultiCityClick!!.click(mStockList[holder.adapterPosition],
-                holder.mDialogRise)
+                risePair, newPair, namePair)
         }
     }
 
@@ -81,6 +87,7 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
             //                });
 
             //            ViewStyleHelper.applyStatus(stock, mCardView);
+            ViewStyleHelper.applyColor(dataBean, this.mDialogPrice)
             ViewStyleHelper.applyColor(dataBean, this.mDialogRise)
         }
     }
@@ -88,6 +95,6 @@ internal class MultiStockAdapter(private val mStockList: List<StockResp.DataBean
     interface OnMultiStockClick {
         fun longClick(dataBean: StockResp.DataBean)
 
-        fun click(dataBean: StockResp.DataBean, clicked: View)
+        fun click(dataBean: StockResp.DataBean, vararg clicked: Pair<View, String>)
     }
 }

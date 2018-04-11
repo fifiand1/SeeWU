@@ -16,7 +16,9 @@
         android:textSize="18sp"
         android:typeface="serif"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:text="去去我我"/>
+        tools:text="去去我我"
+        android:transitionName="stockName"
+        tools:targetApi="lollipop"/>
 
     <TextView
         android:id="@+id/dialog_rise"
@@ -27,10 +29,12 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:typeface="monospace"
+        android:transitionName="newPrice"
         app:layout_constraintBaseline_toBaselineOf="@+id/dialog_price"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toEndOf="@+id/dialog_price"
-        tools:text="12345"/>
+        tools:text="12345"
+        tools:targetApi="lollipop"/>
 
     <TextView
         android:id="@+id/dialog_price"

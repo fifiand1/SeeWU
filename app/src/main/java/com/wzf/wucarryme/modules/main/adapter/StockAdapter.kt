@@ -46,7 +46,7 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
         //            TYPE_TWO -> return HoursWeatherViewHolder(
         //                    LayoutInflater.from(mContext).inflate(R.layout.item_hour_info, parent, false))
             else     -> HoursWeatherViewHolder(
-                LayoutInflater.from(mContext).inflate(R.layout.item_hour_info, parent, false))
+                LayoutInflater.from(mContext).inflate(R.layout.item_stock_five_gear, parent, false))
         }
     }
 
@@ -72,9 +72,9 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
      */
     internal inner class NowStockViewHolder(itemView: View) : BaseViewHolder<StockResp.DataBean>(itemView) {
 
-        @BindView(R.id.weather_icon)
+        //        @BindView(R.id.weather_icon)
         lateinit var weatherIcon: ImageView
-        @BindView(R.id.stock_flu)
+        //        @BindView(R.id.stock_flu)
         lateinit var stockFlu: TextView
         @BindView(R.id.stock_max)
         lateinit var stockMax: TextView
@@ -82,7 +82,7 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
         @BindView(R.id.stock_min)
         lateinit var stockMin: TextView
 
-        @BindView(R.id.stock_pm)
+        //        @BindView(R.id.stock_pm)
         lateinit var stockPm: TextView
         @BindView(R.id.stock_now)
         lateinit var stockNewPrice: TextView
@@ -109,7 +109,7 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
         BaseViewHolder<StockResp.DataBean>(itemView) {
 
 
-        private val itemHourInfoLayout: LinearLayout = itemView.findViewById(R.id.item_hour_info_linearlayout)
+        private val itemHourInfoLayout: LinearLayout = itemView.findViewById(R.id.item_stock_five_range_linear_layout)
         private val mBuyPrice = arrayOfNulls<TextView>(5)
         private val mBuyCount = arrayOfNulls<TextView>(5)
         private val mSellPrice = arrayOfNulls<TextView>(5)
@@ -118,11 +118,11 @@ class StockAdapter(private val mStock: StockResp.DataBean) : AnimRecyclerViewAda
         init {
 
             for (i in 0..4) {
-                val view = View.inflate(mContext, R.layout.item_hour_info_line, null)
-                mBuyPrice[i] = view.findViewById(R.id.one_clock)
-                mBuyCount[i] = view.findViewById(R.id.one_temp)
-                mSellPrice[i] = view.findViewById(R.id.one_humidity)
-                mSellCount[i] = view.findViewById(R.id.one_wind)
+                val view = View.inflate(mContext, R.layout.item_stock_five_gear_line, null)
+//                mBuyPrice[i] = view.findViewById(R.id.one_clock)
+//                mBuyCount[i] = view.findViewById(R.id.one_temp)
+//                mSellPrice[i] = view.findViewById(R.id.one_humidity)
+//                mSellCount[i] = view.findViewById(R.id.one_wind)
                 itemHourInfoLayout.addView(view)
             }
         }

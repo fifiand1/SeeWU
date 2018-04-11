@@ -73,8 +73,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val mAdapter = HomePagerAdapter(supportFragmentManager)
         mMainFragment = MainFragment()
         mMultiCityFragment = SelfSelectStockFragment()
-        mAdapter.addTab(mMainFragment!!, "")
-        mAdapter.addTab(mMultiCityFragment!!, "")
+        mAdapter.addTab(mMainFragment!!, "blank")
+        mAdapter.addTab(mMultiCityFragment!!, "list")
         mViewPager.adapter = mAdapter
         val fabVisibilityChangedListener = FabVisibilityChangedListener()
         mTabLayout.setupWithViewPager(mViewPager, false)

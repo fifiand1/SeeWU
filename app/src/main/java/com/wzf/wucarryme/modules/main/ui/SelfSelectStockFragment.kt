@@ -2,6 +2,7 @@ package com.wzf.wucarryme.modules.main.ui
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.util.Pair
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
@@ -19,8 +20,12 @@ import com.wzf.wucarryme.common.utils.RxUtil
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.common.utils.TimeUtil
 import com.wzf.wucarryme.component.RetrofitSingleton
+import com.wzf.wucarryme.component.RxBus
+import com.wzf.wucarryme.component.ViewStyleHelper
 import com.wzf.wucarryme.modules.main.adapter.MultiStockAdapter
 import com.wzf.wucarryme.modules.main.domain.StockResp
+import com.wzf.wucarryme.modules.main.domain.StockUpdateEvent
+import com.wzf.wucarryme.modules.main.domain.StockUpdateFinishEvent
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.util.*
@@ -39,6 +44,7 @@ class SelfSelectStockFragment : BaseFragment() {
     private var disposable: Disposable? = null
 
     private var mView: View? = null
+    private var notify: StockResp.DataBean? = null
 
     /**
      * 加载数据操作,在视图创建之前初始化
@@ -58,10 +64,13 @@ class SelfSelectStockFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // TODO: 2018/3/29 leaks here
-        //        RxBus.getDefault()
-        //            .toObservable(SelfSelectUpdateEvent.class)
-        //            .doOnNext(event -> multiLoad())
-        //            .subscribe();
+        RxBus.default
+            .toObservable(StockUpdateEvent::class.java)
+            .doOnNext({
+                notify = it.stock
+                multiLoad()
+            })
+            .subscribe()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,7 +92,7 @@ class SelfSelectStockFragment : BaseFragment() {
                         // TODO: 2018/3/28 自选保存到数据库或sp
                         // OrmLite.getInstance().delete(new WhereBuilder(CityORM.class).where("name=?", city));
                         multiLoad()
-                        Snackbar.make(getView()!!, String.format(Locale.CHINA, "已经将%s删掉了 Ծ‸ Ծ", dataBean.stockName),
+                        Snackbar.make(view!!, String.format(Locale.CHINA, "已经将%s删掉了 Ծ‸ Ծ", dataBean.stockName),
                             Snackbar
                                 .LENGTH_LONG)
                             .setAction("撤销",
@@ -95,17 +104,13 @@ class SelfSelectStockFragment : BaseFragment() {
                     .show()
             }
 
-            override fun click(dataBean: StockResp.DataBean, clicked: View) {
-                StockDetailActivity.launch(activity!!, dataBean, clicked, "risePrice")
+            override fun click(dataBean: StockResp.DataBean, vararg clicked: Pair<View, String>) {
+                notify = dataBean
+                StockDetailActivity.launch(activity!!, dataBean, *clicked)
             }
         })
 
-        mRefreshLayout.setColorSchemeResources(
-            android.R.color.holo_orange_light,
-            android.R.color.holo_red_light,
-            android.R.color.holo_green_dark,
-            android.R.color.holo_blue_dark
-        )
+        ViewStyleHelper.setSwipeRefreshColor(mRefreshLayout)
         mRefreshLayout.setOnRefreshListener({ this.multiLoad() })
     }
 
@@ -147,6 +152,10 @@ class SelfSelectStockFragment : BaseFragment() {
                     mLayout.visibility = View.VISIBLE
                 } else {
                     mLayout.visibility = View.GONE
+                }
+                if (notify != null) {
+                    val filter = mStocks!!.filter { it == notify }
+                    RxBus.default.post(StockUpdateFinishEvent(filter[0]))
                 }
             }
             .doOnDispose { LogUtil.i(TAG, "doOnDispose: ") }

@@ -1,95 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="@dimen/cardview_margin"
-    android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardCornerRadius="3dp"
-    card_view:cardElevation="2dp">
+<android.support.v7.widget.CardView android:id="@+id/cardView"
+                                    xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="@dimen/cardview_margin"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:foreground="?android:attr/selectableItemBackground"
+                                    card_view:cardCornerRadius="3dp"
+                                    card_view:cardElevation="2dp">
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="15dp">
 
-        <ImageView
-            android:id="@+id/weather_icon"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            tools:src="@mipmap/none"/>
 
-        <LinearLayout
-            android:id="@+id/linear_stock"
+        <TextView
+            android:id="@+id/stock_previous_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textColor="#BDBDBD"
+            android:textSize="12sp"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"
+            tools:text="111.11"/>
 
-            <TextView
-                android:id="@+id/stock_flu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/stock_layout"
-                android:textSize="50sp"
-                android:transitionName="risePrice"
-                tools:targetApi="lollipop"/>
+        <TextView
+            android:id="@+id/stock_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textColor="#BDBDBD"
+            android:textSize="12sp"
+            card_view:layout_constraintBottom_toBottomOf="@+id/stock_now"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="@+id/stock_now"
+            tools:text="222.11"/>
 
-            <LinearLayout
-                android:id="@+id/stock_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+        <TextView
+            android:id="@+id/stock_rise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:textSize="32sp"
+            android:transitionName="risePrice"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/stock_max"
+            tools:targetApi="lollipop"
+            tools:text="5.00%"/>
 
-                <TextView
-                    android:id="@+id/stock_max"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#BDBDBD"
-                    android:textSize="18sp"/>
 
-                <TextView
-                    android:id="@+id/stock_min"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:textColor="#BDBDBD"
-                    android:textSize="18sp"/>
-            </LinearLayout>
+        <TextView
+            android:id="@+id/stock_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#BDBDBD"
+            android:textSize="12sp"
+            card_view:layout_constraintEnd_toEndOf="@+id/stock_now"
+            card_view:layout_constraintStart_toStartOf="@+id/stock_now"
+            card_view:layout_constraintTop_toTopOf="parent"
+            tools:text="222.11"/>
 
-        </LinearLayout>
+        <TextView
+            android:id="@+id/stock_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#BDBDBD"
+            android:textSize="24sp"
+            android:transitionName="newPrice"
+            card_view:layout_constraintBottom_toBottomOf="@+id/stock_rise"
+            card_view:layout_constraintEnd_toStartOf="@+id/stock_rise"
+            card_view:layout_constraintStart_toEndOf="@+id/stock_open"
+            card_view:layout_constraintTop_toTopOf="@+id/stock_rise"
+            tools:text="222.11"
+            tools:targetApi="lollipop"/>
+
+        <TextView
+            android:id="@+id/stock_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#BDBDBD"
+            android:textSize="12sp"
+            card_view:layout_constraintEnd_toEndOf="@+id/stock_now"
+            card_view:layout_constraintStart_toStartOf="@+id/stock_now"
+            card_view:layout_constraintTop_toBottomOf="@+id/stock_now"
+            tools:text="222.11"/>
+
 
         <LinearLayout
+            android:id="@+id/item_stock_five_range_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/linear_stock"
-            android:layout_marginBottom="6dp"
-            android:layout_marginTop="24dp"
-            android:gravity="right">
-
-            <TextView
-                android:id="@+id/stock_pm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="12dp"
-                android:textColor="#BDBDBD"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/stock_now"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#BDBDBD"
-                android:textSize="12sp"/>
-        </LinearLayout>
-    </RelativeLayout>
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/stock_min"/>
+    </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

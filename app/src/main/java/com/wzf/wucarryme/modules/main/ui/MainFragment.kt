@@ -19,7 +19,8 @@ import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.common.utils.ToastUtil
 import com.wzf.wucarryme.component.RetrofitSingleton
 import com.wzf.wucarryme.component.RxBus
-import com.wzf.wucarryme.modules.main.adapter.StockAdapter
+import com.wzf.wucarryme.component.ViewStyleHelper
+//import com.wzf.wucarryme.modules.main.adapter.StockAdapter
 import com.wzf.wucarryme.modules.main.domain.ChangeCityEvent
 import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
@@ -35,7 +36,7 @@ class MainFragment : BaseFragment() {
     lateinit var mProgressBar: ProgressBar
     @BindView(R.id.iv_erro)
     lateinit var mIvError: ImageView
-    private var mAdapter: StockAdapter? = null
+//    private var mAdapter: StockAdapter? = null
 
     private var mView: View? = null
 
@@ -77,15 +78,12 @@ class MainFragment : BaseFragment() {
     }
 
     private fun initView() {
-        mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-                    android.R.color.holo_green_light,
-                    android.R.color.holo_orange_light,
-                    android.R.color.holo_red_light)
+        ViewStyleHelper.setSwipeRefreshColor(mRefreshLayout)
         mRefreshLayout.setOnRefreshListener { mRefreshLayout.postDelayed({ this.load() }, 1000) }
 
         mRecyclerView.layoutManager = LinearLayoutManager(activity)
-        mAdapter = StockAdapter(mWeather)
-        mRecyclerView.adapter = mAdapter
+//        mAdapter = StockAdapter(mWeather)
+//        mRecyclerView.adapter = mAdapter
     }
 
     private fun load() {

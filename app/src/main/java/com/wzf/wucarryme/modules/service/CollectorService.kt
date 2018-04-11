@@ -25,7 +25,7 @@ import java.util.regex.Pattern
 //6月2日10:00
 
 class CollectorService : Service() {
-    private val TAG = CollectorService::class.java.getSimpleName()
+    private val TAG = CollectorService::class.java.simpleName
     private var mDisposable: Disposable? = null
     private var mIsUnSubscribed = true
 
@@ -355,10 +355,10 @@ class CollectorService : Service() {
     companion object {
 
 
-        val TITLE = "wu2198股市直播"
+        const val TITLE = "wu2198股市直播"
         internal val url = "http://blog.sina.com.cn/u/1216826604"
         val CONTENT_ID = "sina_keyword_ad_area2"
-        val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%")
+        val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%")
         val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "减掉.*%")
         val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%")
         val CARE_REG = arrayOf("领先.*股", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "改写了新高")

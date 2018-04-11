@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_vertical"
+              android:orientation="horizontal"
+              android:paddingBottom="4dp"
+              android:paddingEnd="16dp"
+              android:paddingStart="16dp"
+              android:paddingTop="4dp">
+
+    <TextView
+        android:id="@+id/one_price"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawablePadding="2dp"
+        android:drawableStart="@drawable/icon_time"
+        android:textAlignment="textStart"
+        tools:text="16:00"/>
+
+    <TextView
+        android:id="@+id/one_hand"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawablePadding="2dp"
+        android:drawableStart="@drawable/icon_wind"
+        android:textAlignment="textStart"
+        tools:text="14Km"/>
+
+</LinearLayout>
