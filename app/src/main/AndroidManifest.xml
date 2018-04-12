@@ -63,6 +63,12 @@
             android:name=".modules.service.CollectorService"
             android:enabled="true">
         </service>
+
+        <activity
+            android:name=".modules.buysell.ui.PositionActivity"
+            android:label="@string/title_activity_position"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>

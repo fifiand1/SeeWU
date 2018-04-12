@@ -38,8 +38,8 @@ fork from就看天气 ——是一款遵循 **Material Design** 风格的只看�
 - [x] collector service(jsoup)
 - [x] 通知栏提醒
 - [x] 改成kotlin
-- [ ] 股票当日详情刷新
-- [ ] UI(直播仓位变化)
+- [x] 股票当日详情刷新
+- [x] UI(直播仓位变化)
 - [ ] UI(直播关注个股)
 - [ ] UI(直播内容)
 - [x] UI(自选实时行情)

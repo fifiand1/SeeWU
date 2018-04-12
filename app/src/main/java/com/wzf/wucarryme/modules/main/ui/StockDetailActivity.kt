@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.BindView
-import butterknife.ButterKnife
 import com.wzf.wucarryme.R
 import com.wzf.wucarryme.base.ToolbarActivity
 import com.wzf.wucarryme.common.IntentKey
@@ -58,7 +57,6 @@ class StockDetailActivity : ToolbarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ButterKnife.bind(this)
 
         for (i in 0..9) {
             val view = View.inflate(this, R.layout.item_stock_five_gear_line, null)

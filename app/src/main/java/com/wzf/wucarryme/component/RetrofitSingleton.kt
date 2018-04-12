@@ -145,7 +145,7 @@ class RetrofitSingleton private constructor() {
                     t.toString().contains("UnknownHostException")) {
                     ToastUtil.showShort("网络问题")
                 } else if (t.toString().contains("API没有")) {
-                    OrmLite.getInstance()!!.delete(WhereBuilder(CityORM::class.java).where("name=?",
+                    OrmLite.getInstance().delete(WhereBuilder(CityORM::class.java).where("name=?",
                         Util.replaceInfo(t.message)))
                     ToastUtil.showShort("错误: " + t.message)
                 }

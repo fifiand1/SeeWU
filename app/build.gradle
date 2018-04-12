@@ -97,9 +97,14 @@ dependencies {
 
     //share
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.1.6'
+
+    //kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    //chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+
 }
 repositories {
     mavenCentral()
 }
-

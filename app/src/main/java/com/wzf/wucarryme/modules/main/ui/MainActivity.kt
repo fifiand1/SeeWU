@@ -22,6 +22,7 @@ import com.wzf.wucarryme.common.utils.CircularAnimUtil
 import com.wzf.wucarryme.common.utils.RxDrawer
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.modules.about.ui.AboutActivity
+import com.wzf.wucarryme.modules.buysell.ui.PositionActivity
 import com.wzf.wucarryme.modules.city.ui.ChoiceCityActivity
 import com.wzf.wucarryme.modules.main.adapter.HomePagerAdapter
 import com.wzf.wucarryme.modules.service.CollectorService
@@ -53,7 +54,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         //        startService(new Intent(this, AutoUpdateService.class));
         startService(Intent(this, CollectorService::class.java))
     }
-
 
     override fun layoutId(): Int {
         return R.layout.activity_main
@@ -124,15 +124,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         RxDrawer.close(this.mDrawerLayout)
-                .doOnNext {
-                    when (item.itemId) {
-                        R.id.nav_set          -> SettingActivity.launch(this@MainActivity)
-                        R.id.nav_about        -> AboutActivity.launch(this@MainActivity)
-                        R.id.nav_city         -> ChoiceCityActivity.launch(this@MainActivity)
-                        R.id.nav_multi_cities -> mViewPager.currentItem = 1
-                    }
+            .doOnNext {
+                when (item.itemId) {
+                    R.id.nav_set          -> SettingActivity.launch(this@MainActivity)
+                    R.id.nav_about        -> AboutActivity.launch(this@MainActivity)
+                    R.id.nav_city         -> ChoiceCityActivity.launch(this@MainActivity)
+                    R.id.nav_position     -> PositionActivity.launch(this@MainActivity)
+                    R.id.nav_multi_cities -> mViewPager.currentItem = 1
                 }
-                .subscribe()
+            }
+            .subscribe()
         return false
     }
 
@@ -140,7 +141,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (position == 1) {
             mFab.setImageResource(R.drawable.ic_add_24dp)
             mFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color
-                    .colorPrimary))
+                .colorPrimary))
             mFab.setOnClickListener {
                 val intent = Intent(this@MainActivity, ChoiceCityActivity::class.java)
                 intent.putExtra(C.MULTI_CHECK, true)
@@ -149,7 +150,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         } else {
             mFab.setImageResource(R.drawable.ic_favorite)
             mFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color
-                    .colorAccent))
+                .colorAccent))
             mFab.setOnClickListener { showShareDialog() }
         }
     }

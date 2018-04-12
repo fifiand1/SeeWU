@@ -1,22 +1,20 @@
 package com.wzf.wucarryme.component
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-
+import android.os.Environment
 import com.litesuits.orm.LiteOrm
 import com.wzf.wucarryme.BuildConfig
 import com.wzf.wucarryme.R
 import com.wzf.wucarryme.base.BaseApplication
 import com.wzf.wucarryme.common.C
-
-import android.os.Environment
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 /**
  * 统一数据库操作都使用OrmLite
  */
 class OrmLite private constructor() {
+
     private var sLiteOrm: LiteOrm? = null
 
     init {
@@ -28,18 +26,18 @@ class OrmLite private constructor() {
 
     companion object {
 
-        val DB_NAME = "wu.db" //数据库名字
-        val PACKAGE_NAME = "com.wzf.wucarryme"
-        val DB_PATH = "/data" + Environment.getDataDirectory().absolutePath + "/" +
-                PACKAGE_NAME + "/databases"  //在手机里存放数据库的位置(/data/data/com.wzf.wucarryme/databases/wu.db)
-        val DB_FILE = DB_PATH + "/" + DB_NAME //数据库名字
+        private const val DB_NAME = "wu.db" //数据库名字
+        private const val PACKAGE_NAME = "com.wzf.wucarryme"
+        private val DB_PATH = "/data" + Environment.getDataDirectory().absolutePath + "/" +
+            PACKAGE_NAME + "/databases"  //在手机里存放数据库的位置(/data/data/com.wzf.wucarryme/databases/wu.db)
+        private val DB_FILE = "$DB_PATH/$DB_NAME" //数据库名字
         private var instance: OrmLite? = null
 
-        fun getInstance(): LiteOrm? {
+        fun getInstance(): LiteOrm {
             if (instance == null) {
                 instance = OrmLite()
             }
-            return instance!!.sLiteOrm
+            return instance!!.sLiteOrm!!
         }
 
         /**
@@ -48,7 +46,7 @@ class OrmLite private constructor() {
         fun checkDB() {
             val file = File(DB_FILE)
             if (!file.exists()) {
-                val `is` = BaseApplication.appContext!!.getResources().openRawResource(R.raw.wu) //欲导入的数据库
+                val `is` = BaseApplication.appContext!!.resources.openRawResource(R.raw.wu) //欲导入的数据库
                 var fos: FileOutputStream? = null
                 try {
                     try {

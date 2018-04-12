@@ -46,22 +46,22 @@ class CollectorService : Service() {
                 val autoRefresh = SharedPreferenceUtil.instance.blogAutoRefresh
                 if (autoRefresh != 0) {
                     mDisposable = Observable.interval(0, autoRefresh.toLong(), TimeUnit.MINUTES)
-                            .observeOn(Schedulers.io())
-                            .doOnSubscribe { disposable ->
-                                LogUtil.d(TAG, "jsoup TodayURL " + Thread.currentThread().name)
-                                if(!jsoupTodayURL()){
-                                    disposable.dispose()
-                                }
+                        .observeOn(Schedulers.io())
+                        .doOnSubscribe { disposable ->
+                            LogUtil.d(TAG, "jsoup TodayURL " + Thread.currentThread().name)
+                            if (!jsoupTodayURL()) {
+                                disposable.dispose()
                             }
-                            .doOnNext { aLong ->
-                                LogUtil.d(TAG, aLong.toString()+"jsoup Article " + Thread.currentThread().name)
-                                mIsUnSubscribed = false
-                                if (TimeUtil.isKP || storedNormal.size == 0) {
-                                    jsoupArticle()
-                                }
+                        }
+                        .doOnNext { aLong ->
+                            LogUtil.d(TAG, aLong.toString() + "jsoup Article " + Thread.currentThread().name)
+                            mIsUnSubscribed = false
+                            if (TimeUtil.isKP || storedNormal.size == 0) {
+                                jsoupArticle()
                             }
-                            .subscribeOn(Schedulers.io())
-                            .subscribe()
+                        }
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
                 }
             }
         }
@@ -121,9 +121,9 @@ class CollectorService : Service() {
                             val x = "************************买入选择************************"
                             print(TYPE_BUY, x)
                             print(TYPE_BUY, "************************" + item.stock1 +
-                                    "************************" + item.count1)
+                                "************************" + item.count1)
                             print(TYPE_BUY, "************************" + item.stock2 +
-                                    "************************" + item.count2)
+                                "************************" + item.count2)
                             print(TYPE_BUY, x)
                         }
                         insertExcelBUY(strings, text)
@@ -169,19 +169,19 @@ class CollectorService : Service() {
 
         val blogTime = StringUtil.getBlogTime(text)
         val nowYMDHMSTime = TimeUtil.nowYMDHMSTime
-        buySellORM.action = "POS"
+        buySellORM.action = TYPE_POSITION
         buySellORM.stock1 = position.toString()
         buySellORM.blogTime = todayDate + blogTime
         buySellORM.logTime = nowYMDHMSTime
         buySellORM.desc = text
-        OrmLite.getInstance()!!.insert(buySellORM)
+        OrmLite.getInstance().insert(buySellORM)
         NotificationHelper.showPositioningNotification(this@CollectorService, buySellORM)
 
     }
 
     private fun insertExcelBUY(strings: List<BuySellORM>, p: String) {
         try {
-            OrmLite.getInstance()!!.insert(strings)
+            OrmLite.getInstance().insert(strings)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -209,7 +209,7 @@ class CollectorService : Service() {
             val bankuai = bankuaiList[i]
 
             val buySellORM = BuySellORM()
-            buySellORM.action = "BUY"
+            buySellORM.action = TYPE_BUY
             buySellORM.blogTime = todayDate + blogTime
             buySellORM.category = bankuai
             buySellORM.logTime = nowYMDHMSTime
@@ -218,18 +218,18 @@ class CollectorService : Service() {
 
                 var like = "CATEGORY_ like '%$bankuai'"
                 var sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
-                        "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
-                        "GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
+                    "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
+                    "GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
                 LogUtil.d(TAG, "searchMaybeBought() sql = [$sql]")
-                var readableDatabase = OrmLite.getInstance()!!.readableDatabase
+                var readableDatabase = OrmLite.getInstance().readableDatabase
                 var cursor = readableDatabase.rawQuery(sql, null)
                 if (cursor.count < 1) {
                     like = StringUtil.genLike("CATEGORY_", bankuai)
                     sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
-                            "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
-                            "GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
+                        "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
+                        "GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
                     LogUtil.d(TAG, "searchMaybeBought() sql = [$sql]")
-                    readableDatabase = OrmLite.getInstance()!!.readableDatabase
+                    readableDatabase = OrmLite.getInstance().readableDatabase
                     cursor = readableDatabase.rawQuery(sql, null)
                 }
 
@@ -260,14 +260,12 @@ class CollectorService : Service() {
         return result
     }
 
-
     private fun insertCare(p: String, group: String) {
         var p = p
         var group = group
         try {
             group = group.substring(2, group.length - 1)
             val category = banKuai(group)
-
 
             val blogTime = StringUtil.getBlogTime(p)
             p = p.substring(p.indexOf(" ") + 1)
@@ -278,11 +276,11 @@ class CollectorService : Service() {
                 val formated = StringUtil.formatCNName(cnName)
 
                 val care = CareORM(todayDate + blogTime,
-                        category, formated, "", nowYMDHMSTime)
+                    category, formated, "", nowYMDHMSTime)
                 list.add(care)
 
             }
-            val result = OrmLite.getInstance()!!.insert(list)
+            val result = OrmLite.getInstance().insert(list)
             LogUtil.d(TAG, "add care $category: $result")
             //            long l = OrmLite.getInstance().queryCount(CareORM.class);
             //            LogUtil.d(TAG, "after care: " + l);
@@ -297,8 +295,8 @@ class CollectorService : Service() {
     }
 
     private fun insertExcelSELL(s: String) {
-        val p = Pattern.compile("(%[^股]*股)")
-        val m = p.matcher(s)
+        var p = Pattern.compile("(%[^股]*股)")
+        var m = p.matcher(s)
         val bankuaiList = ArrayList<String>()
         while (m.find()) {
             val group = m.group()
@@ -310,15 +308,23 @@ class CollectorService : Service() {
 
             val list = ArrayList<BuySellORM>()
             val nowYMDHMSTime = TimeUtil.nowYMDHMSTime
+            if (bankuaiList.size == 0) {
+                p = Pattern.compile("(%[^,]*,)")
+                m = p.matcher(s)
+                while (m.find()) {
+                    val group = m.group()
+                    bankuaiList.add(banKuai(group.substring(1, group.length - 1)))
+                }
+            }
             for (i in bankuaiList.indices) {
                 val bankuai = bankuaiList[i]
 
                 val buySell = BuySellORM(todayDate + blogTime,
-                        bankuai, "SELL", "", "", s, nowYMDHMSTime)
+                    bankuai, TYPE_SELL, "", "", s, nowYMDHMSTime)
                 list.add(buySell)
                 NotificationHelper.showPositioningNotification(this@CollectorService, buySell)
             }
-            OrmLite.getInstance()!!.insert(list)
+            OrmLite.getInstance().insert(list)
         } catch (ignored: Exception) {
 
         }
@@ -360,7 +366,7 @@ class CollectorService : Service() {
         val CONTENT_ID = "sina_keyword_ad_area2"
         val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%")
         val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "减掉.*%")
-        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%")
+        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "目前短线帐户仓位是零")
         val CARE_REG = arrayOf("领先.*股", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "改写了新高")
 
         val collectDate = arrayOf<String>()
@@ -372,7 +378,7 @@ class CollectorService : Service() {
         //卖出
         const val TYPE_SELL = "SELL"
         //持仓
-        const val TYPE_POSITION = "POSITION"
+        const val TYPE_POSITION = "POS"
     }
 
 }

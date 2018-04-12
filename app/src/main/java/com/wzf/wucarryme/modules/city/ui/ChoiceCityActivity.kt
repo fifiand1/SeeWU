@@ -97,7 +97,7 @@ class ChoiceCityActivity : ToolbarActivity() {
                 } else if (currentLevel == LEVEL_CITY) {
                     val city = Util.replaceCity(cityList!![pos].mCityName)
                     if (isChecked) {
-                        OrmLite.getInstance()?.save(CityORM(city))
+                        OrmLite.getInstance().save(CityORM(city))
                         RxBus.default.post(SelfSelectUpdateEvent())
                     } else {
 //                        SharedPreferenceUtil.instance.setCityName(city)

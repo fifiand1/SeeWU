@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.app.AppCompatDelegate
 import butterknife.ButterKnife
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
-import java.io.File
 
 abstract class BaseActivity : RxAppCompatActivity() {
 
@@ -52,10 +51,5 @@ abstract class BaseActivity : RxAppCompatActivity() {
             activity.recreate()
         }
 
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val file = File("D:\\workspace\\wu.xls")
-
-        }
     }
 }
