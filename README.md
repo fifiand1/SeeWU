@@ -1,12 +1,12 @@
 # WU carry me!
-[![Build Status](https://travis-ci.org/xcc3641/SeeWeather.svg?branch=master)](https://travis-ci.org/xcc3641/SeeWeather)
+[![Build Status]()]()
 
 通过jsoup采集博客直播内容, 跟踪仓位变化, 以及猜测自选
 
 ----
 
 ### 简介
-fork from就看天气 ——是一款遵循 **Material Design** 风格的只看天气的APP。
+fork from就看天气 ——是一款遵循 **Material Design** 风格的自用股票信息APP。
 
 
 ----
@@ -39,13 +39,13 @@ fork from就看天气 ——是一款遵循 **Material Design** 风格的只看�
 - [x] 通知栏提醒
 - [x] 改成kotlin
 - [x] 股票当日详情刷新
+- [ ] 指数自定义预警
+- [x] UI(自选实时行情)
 - [x] UI(直播仓位变化)
 - [ ] UI(直播关注个股)
 - [ ] UI(直播内容)
-- [x] UI(自选实时行情)
 - [ ] UI(历史仓位变化图表,对比3指数)
 - [ ] UI(关注个股查询)
-- [ ] 引导页面
 - [ ] 管理自选股
 - [ ] widget桌面小部件(stock)
 - [ ] 更好，更多的ICONS

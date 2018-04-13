@@ -1,8 +1,7 @@
 package com.wzf.wucarryme.common.utils
 
-import com.wzf.wucarryme.BuildConfig
-
 import android.util.Log
+import com.wzf.wucarryme.BuildConfig
 
 /**
  * @author wzf
@@ -37,6 +36,12 @@ object LogUtil {
     fun e(tag: String, msg: String) {
         if (BuildConfig.DEBUG) {
             Log.e(tag, msg)
+        }
+    }
+
+    fun wtf(tag: String, msg: String) {
+        if (BuildConfig.DEBUG) {
+            Log.wtf(tag, msg)
         }
     }
 }

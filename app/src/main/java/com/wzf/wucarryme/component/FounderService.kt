@@ -16,6 +16,8 @@ interface FounderService {
         @Query("codeTypes")
         codeTypes: String): Observable<StockResp>
 
+    //同花顺问财选股
+    //http://search.10jqka.com.cn/html/wencaimobileresult/result.html?q=2018%E7%AC%AC%E4%B8%80%E5%AD%A3%E5%BA%A6%E9%A2%84%E5%A2%9E%3E%3D50%25%20%E4%BC%A0%E5%AA%92&queryType=stock
     //按简拼或代码查询接口
     //https://h5hq.foundersc.com/market_webapp/quote/wizard?code=
 
