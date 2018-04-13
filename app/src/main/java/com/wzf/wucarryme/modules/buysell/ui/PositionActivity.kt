@@ -36,6 +36,10 @@ class PositionActivity : ToolbarActivity() {
         return R.layout.activity_position
     }
 
+    override fun canBack(): Boolean {
+        return true
+    }
+
     override fun onStart() {
         super.onStart()
         for (c in ColorTemplate.MATERIAL_COLORS)
@@ -44,7 +48,7 @@ class PositionActivity : ToolbarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setSupportActionBar(toolbar)
+//        setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -87,11 +91,14 @@ class PositionActivity : ToolbarActivity() {
         val split = str.split(".")
         var rest = 100f
         for (i in split.indices) {
-            val value = digitPattern.matcher(split[i])
-            val trim = value.replaceAll("").trim()
-            val toFloat = trim.toFloat()
-            rest -= toFloat
-            entries.add(PieEntry(toFloat, split[i].replace("$trim%", "")))
+            try {
+                val value = digitPattern.matcher(split[i])
+                val trim = value.replaceAll("").trim()
+                val toFloat = trim.toFloat()
+                rest -= toFloat
+                entries.add(PieEntry(toFloat, split[i].replace("$trim%", "")))
+            } catch (e: Exception) {
+            }
         }
         entries.add(PieEntry(rest, "空"))
 

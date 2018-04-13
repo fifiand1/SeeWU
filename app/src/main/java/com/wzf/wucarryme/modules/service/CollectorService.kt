@@ -88,7 +88,7 @@ class CollectorService : Service() {
             e.printStackTrace()
         }
 
-        LogUtil.i(TAG, "URL " + todayURL)
+        LogUtil.i(TAG, "URL $todayURL")
         return "" != todayURL
     }
 
@@ -359,15 +359,13 @@ class CollectorService : Service() {
     }
 
     companion object {
-
-
         const val TITLE = "wu2198股市直播"
-        internal val url = "http://blog.sina.com.cn/u/1216826604"
-        val CONTENT_ID = "sina_keyword_ad_area2"
+        const val url = "http://blog.sina.com.cn/u/1216826604"
+        const val CONTENT_ID = "sina_keyword_ad_area2"
         val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%")
         val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "减掉.*%")
-        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "目前短线帐户仓位是零")
-        val CARE_REG = arrayOf("领先.*股", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "改写了新高")
+        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "仓位是零", "仓位暂时是零")
+        val CARE_REG = arrayOf("领先.*股", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "出现涨停", "改写了新高")
 
         val collectDate = arrayOf<String>()
         val collectURL = arrayOf<String>()

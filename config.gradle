@@ -9,14 +9,4 @@ ext {
         versionName      : "1.0.0",
         resConfigs       : "zh"
     ]
-//
-//    weather = [
-//        name : "WeatherKey",
-//        value: "282f3846df6b41178e4a2218ae083ea7"
-//    ]
-//
-//    fir = [
-//        name : "FirToken",
-//        value: "7db041d0c3013b63e4bed2a554f02d85"
-//    ]
 }

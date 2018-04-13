@@ -36,7 +36,7 @@ abstract class ToolbarActivity : BaseActivity() {
     }
 
     open fun canBack(): Boolean {
-        return false
+        return true
     }
 
     protected fun setAppBarAlpha(alpha: Float) {
