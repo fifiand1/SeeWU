@@ -49,3 +49,5 @@ projectFilesBackup/
 
 # backup
 wu.db
+src/main/java/com/wzf/wucarryme/modules/care/db/
+src/main/res/raw/

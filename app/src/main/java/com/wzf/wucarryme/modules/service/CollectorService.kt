@@ -16,6 +16,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.jsoup.Jsoup
+import org.jsoup.UncheckedIOException
 import org.jsoup.nodes.Document
 import java.io.IOException
 import java.util.*
@@ -149,6 +150,9 @@ class CollectorService : Service() {
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
+        } catch (e: UncheckedIOException) {
+            //这个Exception的类型是Error...wtf
             e.printStackTrace()
         }
 
