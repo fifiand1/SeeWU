@@ -58,6 +58,10 @@ class CollectorService : Service() {
                             LogUtil.d(TAG, aLong.toString() + "jsoup Article " + Thread.currentThread().name)
                             mIsUnSubscribed = false
                             if (TimeUtil.isKP || storedNormal.size == 0) {
+                                //app居然一直在后台没被杀死
+                                if (todayDate != TimeUtil.nowYueRi) {
+                                    jsoupTodayURL()
+                                }
                                 jsoupArticle()
                             }
                         }
@@ -89,7 +93,7 @@ class CollectorService : Service() {
             e.printStackTrace()
         }
 
-        LogUtil.i(TAG, "URL $todayURL")
+        LogUtil.i(TAG, "today URL -> $todayURL")
         return "" != todayURL
     }
 
