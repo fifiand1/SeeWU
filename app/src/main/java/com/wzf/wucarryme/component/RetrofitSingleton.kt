@@ -1,5 +1,6 @@
 package com.wzf.wucarryme.component
 
+import com.github.promeg.pinyinhelper.Pinyin
 import com.litesuits.orm.db.assit.WhereBuilder
 import com.wzf.wucarryme.common.C
 import com.wzf.wucarryme.common.utils.LogUtil
@@ -19,7 +20,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
-
 
 class RetrofitSingleton private constructor() {
 
@@ -41,13 +41,48 @@ class RetrofitSingleton private constructor() {
         val random = Math.random().toString()
 //        val codes = "300443,603444,300628,002460,600518,601166,300583,300725,300528,1A0001,2A01,399006"
 //        val codeTypes = "4621,4353,4621,4614,4353,4353,4621,4621,4621,4352,4608,4608"
-        val codes = "603444,300628,300725,300528,1A0001,2A01,399006"
-        val codeTypes = "4353,4621,4621,4621,4352,4608,4608"
+        val codes = "603444,300628,300725,002460,600291,1A0001,2A01,399006"
+        val codeTypes = "4353,4621,4621,4614,4353,4352,4608,4608"
         return try {
             sApiService.listStocks(random, codes, codeTypes)
                 .map { stockResp ->
                     LogUtil.i(TAG, stockResp.toString())
                     stockResp.data
+                }
+                .doOnError { t -> disposeFailureInfo(t) }
+                .compose(RxUtil.io())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Observable.error(e)
+        }
+
+    }
+
+    fun fetchStockByNameCN(nameCN: String): Observable<StockResp.DataBean> {
+        val random = Math.random().toString()
+        val sb = StringBuilder()
+        nameCN.toCharArray().forEach {
+            val toPinyin = Pinyin.toPinyin(it)
+            sb.append(toPinyin.substring(0, 1))
+        }
+        val nameEN = sb.toString()
+
+        return try {
+            sApiService.listWizard(nameEN)
+                .map { wizardResp ->
+                    wizardResp.data.forEach {
+                        if (it.stockName != nameCN) {
+                            wizardResp.data.remove(it)
+                        }
+                    }
+                    wizardResp
+                }
+                .flatMap {
+                    // FIXME: 2018/5/9 没有找到历史价格接口, 暂时先用当前价格
+                    sApiService.listStocks(random, it.data.peek().stockCode, it.data.peek().codeType)
+                }
+                .map {
+                    it.data[0]
                 }
                 .doOnError { t -> disposeFailureInfo(t) }
                 .compose(RxUtil.io())

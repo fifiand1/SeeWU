@@ -1,11 +1,6 @@
 package com.wzf.wucarryme.modules.care.domain
 
-
-import com.litesuits.orm.db.annotation.Column
-import com.litesuits.orm.db.annotation.Ignore
-import com.litesuits.orm.db.annotation.NotNull
-import com.litesuits.orm.db.annotation.PrimaryKey
-import com.litesuits.orm.db.annotation.Table
+import com.litesuits.orm.db.annotation.*
 import com.litesuits.orm.db.enums.AssignType
 
 /**
@@ -29,6 +24,14 @@ class BuySellORM {
     var stock1: String? = null
     @Column("STOCK2_")
     var stock2: String? = null
+    @Column("STOCK1_PRICE")
+    var stock1Price: String? = null
+    @Column("STOCK2_PRICE")
+    var stock2Price: String? = null
+    @Column("STOCK1_RETURN")
+    var stock1Return: String? = null
+    @Column("STOCK2_RETURN")
+    var stock2Return: String? = null
     @Column("DESC_")
     var desc: String? = null
     @Column("LOG_TIME")

@@ -3,6 +3,7 @@ package com.wzf.wucarryme.modules.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.litesuits.orm.db.assit.QueryBuilder
 import com.wzf.wucarryme.common.utils.LogUtil
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.common.utils.StringUtil
@@ -10,13 +11,15 @@ import com.wzf.wucarryme.common.utils.StringUtil.banKuai
 import com.wzf.wucarryme.common.utils.TimeUtil
 import com.wzf.wucarryme.component.NotificationHelper
 import com.wzf.wucarryme.component.OrmLite
+import com.wzf.wucarryme.component.RetrofitSingleton
 import com.wzf.wucarryme.modules.care.domain.BuySellORM
 import com.wzf.wucarryme.modules.care.domain.CareORM
+import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import org.jsoup.Jsoup
-import org.jsoup.UncheckedIOException
 import org.jsoup.nodes.Document
 import java.io.IOException
 import java.util.*
@@ -76,7 +79,7 @@ class CollectorService : Service() {
     private fun jsoupTodayURL(): Boolean {
         try {
             todayDate = TimeUtil.nowYueRi
-            //            todayDate = "3月22日";
+//            todayDate = "5月8日"
             doc = Jsoup.connect(url).get()
             val elementsByAttributeValue = doc.getElementsByAttributeValue("class", "blog_title_h")
             for (element in elementsByAttributeValue) {
@@ -109,12 +112,67 @@ class CollectorService : Service() {
                 //                LogUtil.i(TAG, "get one-> " + text);
 
                 val care = important(text, CARE_REG)
+
                 //卖出
                 if (important(text, SELL_REG) != null) {
                     if (!storedSold.contains(text)) {
                         storedSold.add(text)
-                        print(TYPE_SELL, text)
-                        insertExcelSELL(text)
+
+                        val insertExcelSELL = insertExcelSELL(text)
+                        val blogTime = StringUtil.getBlogTime(text)
+                        for (item in insertExcelSELL) {
+                            // TODO: 2018/5/9 仓位%暂时不管
+                            //找出当时买的
+                            val query = OrmLite.getInstance().query(QueryBuilder(BuySellORM::class.java)
+                                .where("CATEGORY_ = ? AND ACTION_ = ?", item.category, CollectorService.TYPE_BUY)
+                                .appendOrderDescBy("ID_").limit("1"))
+
+                            if (query.size > 0 && query[0].stock1 != null) {
+                                //得到现在价格
+                                val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock1!!)
+                                val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock2!!)
+
+                                Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
+                                .DataBean, BuySellORM> { t1, t2 ->
+                                    item.stock1 = t1.stockName
+                                    item.stock1Price = t1.newPrice
+                                    item.stock2 = t2.stockName
+                                    item.stock2Price = t2.newPrice
+                                    //计算收益
+                                    val lastBuyPrice = query[0].stock1Price
+                                    if (lastBuyPrice != null) {
+                                        item.stock1Return = String.format(Locale.CHINA,
+                                            "%.2f",
+                                            (t1.newPrice!!.toFloat() - lastBuyPrice.toFloat())
+                                                / lastBuyPrice.toFloat() * 100) + "%"
+                                    }
+                                    val lastBuyPrice2 = query[0].stock2Price
+                                    if (lastBuyPrice2 != null) {
+                                        item.stock2Return = String.format(Locale.CHINA,
+                                            "%.2f",
+                                            (t2.newPrice!!.toFloat() - lastBuyPrice2.toFloat())
+                                                / lastBuyPrice2.toFloat() * 100) + "%"
+                                    }
+                                    return@BiFunction item
+                                }).subscribe {
+                                    //插入数据
+                                    print(TYPE_SELL, text)
+                                    val x = "$blogTime************************卖出参考************************"
+                                    print(TYPE_SELL, x)
+                                    print(TYPE_SELL, "************************" + item.stock1 + item.stock1Price +
+                                        "************************" + item.stock1Return)
+                                    print(TYPE_SELL, "************************" + item.stock2 + item.stock2Price +
+                                        "************************" + item.stock2Return)
+                                    print(TYPE_SELL, x)
+                                    insertBuySell(item)
+                                }
+                            } else {
+                                //没找到之前记录 直接插入
+                                print(TYPE_SELL, text)
+                                insertBuySell(item)
+                            }
+
+                        }
                     }
                 } else if (important(text, BUY_REG) != null) {
                     //买入
@@ -122,16 +180,28 @@ class CollectorService : Service() {
                         storedBought.add(text)
                         print(TYPE_BUY, text)
                         val strings = searchMaybeBought(text)
+                        val blogTime = StringUtil.getBlogTime(text)
                         for (item in strings) {
-                            val x = "************************买入选择************************"
-                            print(TYPE_BUY, x)
-                            print(TYPE_BUY, "************************" + item.stock1 +
-                                "************************" + item.count1)
-                            print(TYPE_BUY, "************************" + item.stock2 +
-                                "************************" + item.count2)
-                            print(TYPE_BUY, x)
+                            val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock1!!)
+                            val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock2!!)
+
+                            Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
+                            .DataBean, BuySellORM> { t1, t2 ->
+                                item.stock1Price = t1.newPrice
+                                item.stock2Price = t2.newPrice
+                                return@BiFunction item
+                            }).subscribe {
+                                val x = "$blogTime************************买入选择************************"
+                                print(TYPE_BUY, x)
+                                print(TYPE_BUY, "************************" + item.stock1 + item.stock1Price +
+                                    "************************" + item.count1)
+                                print(TYPE_BUY, "************************" + item.stock2 + item.stock2Price +
+                                    "************************" + item.count2)
+                                print(TYPE_BUY, x)
+                                insertBuySell(item)
+                            }
+
                         }
-                        insertExcelBUY(strings, text)
                     }
                 } else if (important(text, SPACE_REG) != null) {
                     //仓位
@@ -155,8 +225,8 @@ class CollectorService : Service() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-        } catch (e: UncheckedIOException) {
-            //这个Exception的类型是Error...wtf
+        } catch (e: Error) {
+            // jsoup 的 Exception 类型都是 Error
             e.printStackTrace()
         }
 
@@ -187,13 +257,12 @@ class CollectorService : Service() {
 
     }
 
-    private fun insertExcelBUY(strings: List<BuySellORM>, p: String) {
+    private fun insertBuySell(strings: BuySellORM) {
         try {
             OrmLite.getInstance().insert(strings)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
 
     private fun searchMaybeBought(s: String): List<BuySellORM> {
@@ -302,7 +371,7 @@ class CollectorService : Service() {
         LogUtil.e(TAG, "$type -> $text")
     }
 
-    private fun insertExcelSELL(s: String) {
+    private fun insertExcelSELL(s: String): ArrayList<BuySellORM> {
         var p = Pattern.compile("(%[^股]*股)")
         var m = p.matcher(s)
         val bankuaiList = ArrayList<String>()
@@ -312,18 +381,18 @@ class CollectorService : Service() {
         }
 
         val blogTime = StringUtil.getBlogTime(s)
-        try {
 
-            val list = ArrayList<BuySellORM>()
-            val nowYMDHMSTime = TimeUtil.nowYMDHMSTime
-            if (bankuaiList.size == 0) {
-                p = Pattern.compile("(%[^,]*,)")
-                m = p.matcher(s)
-                while (m.find()) {
-                    val group = m.group()
-                    bankuaiList.add(banKuai(group.substring(1, group.length - 1)))
-                }
+        val list = ArrayList<BuySellORM>()
+        val nowYMDHMSTime = TimeUtil.nowYMDHMSTime
+        if (bankuaiList.size == 0) {
+            p = Pattern.compile("(%[^,]*,)")
+            m = p.matcher(s)
+            while (m.find()) {
+                val group = m.group()
+                bankuaiList.add(banKuai(group.substring(1, group.length - 1)))
             }
+        }
+        try {
             for (i in bankuaiList.indices) {
                 val bankuai = bankuaiList[i]
 
@@ -332,11 +401,12 @@ class CollectorService : Service() {
                 list.add(buySell)
                 NotificationHelper.showPositioningNotification(this@CollectorService, buySell)
             }
-            OrmLite.getInstance().insert(list)
-        } catch (ignored: Exception) {
-
+            return list
+//            OrmLite.getInstance().insert(list)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
+        return list
     }
 
     private fun important(p: String, reg: Array<String>): String? {

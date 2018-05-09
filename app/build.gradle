@@ -104,6 +104,9 @@ dependencies {
     //chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
+    //pinyin
+    implementation 'com.github.promeg:tinypinyin:2.0.3' // TinyPinyin核心包，约80KB
+
 }
 repositories {
     mavenCentral()

@@ -1,12 +1,12 @@
 # WU carry me!
 [![Build Status]()]()
 
-通过jsoup采集博客直播内容, 跟踪仓位变化, 以及猜测自选
+通过jsoup采集博客直播内容, 跟踪仓位变化, 猜测自选作为买卖选择
 
 ----
 
 ### 简介
-fork from就看天气 ——是一款遵循 **Material Design** 风格的自用股票信息APP。
+一款遵循 **Material Design** 风格的自用股票辅助APP。
 
 
 ----
@@ -35,6 +35,7 @@ fork from就看天气 ——是一款遵循 **Material Design** 风格的自用�
 - [x] 通知栏提醒
 - [x] 改成kotlin
 - [x] 股票当日详情刷新
+- [x] 买卖记录增加实时价格,测算回报率
 - [ ] 指数自定义预警
 - [x] UI(自选实时行情)
 - [x] UI(直播仓位变化)
@@ -60,10 +61,6 @@ fork from就看天气 ——是一款遵循 **Material Design** 风格的自用�
 4. [GLide][5]
 
 
-### 截图
-
-![][image-2]
-![][image-3]
 
 ### 感谢
 感谢开源，感谢See Weather，学习到了前辈们优秀的代码：
@@ -121,4 +118,3 @@ __软件中图片素材均来源于网络，版权属于原作者。__
 
 [image-2]: /images/day.png
 [image-3]: /images/night.png
-[image-5]: http://xcc3641.qiniudn.com/app-%E6%94%AF%E4%BB%98%E5%AE%9D.jpg
