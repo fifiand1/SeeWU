@@ -1,19 +1,16 @@
 package com.wzf.wucarryme.common.utils
 
+import android.annotation.SuppressLint
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-
-import android.annotation.SuppressLint
+import java.util.*
 
 object TimeUtil {
-    private val TAG = TimeUtil::class.java!!.getSimpleName()
+    private val TAG = TimeUtil::class.java.simpleName
 
-    var simpleDateFormat = SimpleDateFormat("M月d日")
-    var simpleDateFormat2 = SimpleDateFormat("M月d日 HH:mm:ss")
-    var simpleDateFormat3 = SimpleDateFormat("M月d日HH:mm")
+    var simpleDateFormat = SimpleDateFormat("M月d日", Locale.SIMPLIFIED_CHINESE)
+    var simpleDateFormat2 = SimpleDateFormat("M月d日 HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
+    var simpleDateFormat3 = SimpleDateFormat("M月d日HH:mm", Locale.SIMPLIFIED_CHINESE)
 
     /**
      * yyyy-MM-dd HH:mm:ss
@@ -66,10 +63,10 @@ object TimeUtil {
                 return false
             }
             val format = SimpleDateFormat("HHmm", Locale.CHINA)
-            val startAM = "0915"
-            val endAM = "1130"
-            val startPM = "1300"
-            val endPM = "1500"
+            val startAM = "0910"
+            val endAM = "1135"
+            val startPM = "1255"
+            val endPM = "1505"
             val dateStartAM: Date
             val dateEndAM: Date
             val dateStartPM: Date
