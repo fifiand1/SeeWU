@@ -2,21 +2,22 @@ package com.wzf.wucarryme.common.utils
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Resources
 import android.util.TypedValue
 import com.wzf.wucarryme.base.BaseApplication
 
 object EnvUtil {
 
-    private val TAG = EnvUtil::class.java!!.getSimpleName()
+    private val TAG = EnvUtil::class.java.simpleName
     private var sStatusBarHeight: Int = 0
 
     val statusBarHeight: Int
         get() {
             if (sStatusBarHeight == 0) {
-                val resourceId = BaseApplication.appContext!!.getResources().getIdentifier("status_bar_height", "dimen", "android")
+                val resourceId = BaseApplication.appContext!!.resources.getIdentifier("status_bar_height",
+                    "dimen",
+                    "android")
                 if (resourceId > 0) {
-                    sStatusBarHeight = BaseApplication.appContext!!.getResources().getDimensionPixelSize(resourceId)
+                    sStatusBarHeight = BaseApplication.appContext!!.resources.getDimensionPixelSize(resourceId)
                 }
             }
             return sStatusBarHeight

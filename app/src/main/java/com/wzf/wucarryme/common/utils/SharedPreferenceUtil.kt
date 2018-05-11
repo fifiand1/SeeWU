@@ -31,7 +31,7 @@ class SharedPreferenceUtil private constructor() {
 
     // 自选刷新时间 second
     var stockAutoRefresh: Int
-        get() = mPrefs.getInt(AUTO_REFRESH_STOCK, 60)
+        get() = mPrefs.getInt(AUTO_REFRESH_STOCK, 30)
         set(t) = mPrefs.edit().putInt(AUTO_REFRESH_STOCK, t).apply()
 
     //当前城市

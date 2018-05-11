@@ -2,11 +2,13 @@ package com.wzf.wucarryme.component
 
 import com.github.promeg.pinyinhelper.Pinyin
 import com.litesuits.orm.db.assit.WhereBuilder
+import com.wzf.wucarryme.base.BaseApplication
 import com.wzf.wucarryme.common.C
 import com.wzf.wucarryme.common.utils.LogUtil
 import com.wzf.wucarryme.common.utils.RxUtil
 import com.wzf.wucarryme.common.utils.ToastUtil
 import com.wzf.wucarryme.common.utils.Util
+import com.wzf.wucarryme.component.NotificationHelper.showCustomNotification
 import com.wzf.wucarryme.modules.about.domain.Version
 import com.wzf.wucarryme.modules.main.domain.CityORM
 import com.wzf.wucarryme.modules.main.domain.StockResp
@@ -18,7 +20,6 @@ import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 
 class RetrofitSingleton private constructor() {
@@ -41,12 +42,21 @@ class RetrofitSingleton private constructor() {
         val random = Math.random().toString()
 //        val codes = "300443,603444,300628,002460,600518,601166,300583,300725,300528,1A0001,2A01,399006"
 //        val codeTypes = "4621,4353,4621,4614,4353,4353,4621,4621,4621,4352,4608,4608"
-        val codes = "603444,300628,300725,002460,600291,1A0001,2A01,399006"
-        val codeTypes = "4353,4621,4621,4614,4353,4352,4608,4608"
+        val codes = "603444,300628,300725,002460,300658,300649,1A0001,2A01,399006"
+        val codeTypes = "4353,4621,4621,4614,4621,4621,4352,4608,4608"
         return try {
             sApiService.listStocks(random, codes, codeTypes)
                 .map { stockResp ->
                     LogUtil.i(TAG, stockResp.toString())
+                    val dataBean = stockResp.data[stockResp.data.size - 1]
+                    val newPrice = dataBean.newPrice!!.toFloat()
+                    LogUtil.i(TAG, newPrice.toString())
+                    val low = 1831
+                    if (newPrice <= low) {
+                        showCustomNotification(BaseApplication.appContext!!, dataBean)
+                        MailHelper.sendWarningMail("WARNING",
+                            dataBean.stockName + " now is " + dataBean.newPrice + " < " + low)
+                    }
                     stockResp.data
                 }
                 .doOnError { t -> disposeFailureInfo(t) }
@@ -151,7 +161,7 @@ class RetrofitSingleton private constructor() {
                         return@addInterceptor proceed.newBuilder()
                             .body(ResponseBody.create(mediaType, content))
                             .build()
-                    } catch (e: SocketTimeoutException) {
+                    } catch (e: Exception) {
                         LogUtil.d(TAG, "okhttp [" + e.message + "], rej8try..." + (++totalReconnect))
                     }
 

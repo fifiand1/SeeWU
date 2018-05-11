@@ -51,3 +51,4 @@ projectFilesBackup/
 wu.db
 src/main/java/com/wzf/wucarryme/modules/care/db/
 src/main/res/raw/
+/app/src/main/java/com/wzf/wucarryme/component/MailHelper.kt

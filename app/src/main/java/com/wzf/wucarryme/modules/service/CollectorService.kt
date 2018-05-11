@@ -21,7 +21,6 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
@@ -92,7 +91,7 @@ class CollectorService : Service() {
                     todayURL = element1.attr("href")
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -443,7 +442,7 @@ class CollectorService : Service() {
         val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%")
         val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "减掉.*%")
         val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "仓位是零", "仓位暂时是零")
-        val CARE_REG = arrayOf("领先.*股", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "出现涨停", "改写了新高", "等领先")
+        val CARE_REG = arrayOf("领先.*股", "领先.*板", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "目前领先", "出现涨停", "改写了新高", "等领先")
 
         val collectDate = arrayOf<String>()
         val collectURL = arrayOf<String>()
