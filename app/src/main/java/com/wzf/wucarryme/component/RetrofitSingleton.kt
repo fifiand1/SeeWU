@@ -42,8 +42,8 @@ class RetrofitSingleton private constructor() {
         val random = Math.random().toString()
 //        val codes = "300443,603444,300628,002460,600518,601166,300583,300725,300528,1A0001,2A01,399006"
 //        val codeTypes = "4621,4353,4621,4614,4353,4353,4621,4621,4621,4352,4608,4608"
-        val codes = "603444,300628,300725,002460,300658,300649,1A0001,2A01,399006"
-        val codeTypes = "4353,4621,4621,4614,4621,4621,4352,4608,4608"
+        val codes = "603444,300628,300725,002460,300658,300649,300157,1A0001,2A01,399006"
+        val codeTypes = "4353,4621,4621,4614,4621,4621,4621,4352,4608,4608"
         return try {
             sApiService.listStocks(random, codes, codeTypes)
                 .map { stockResp ->
@@ -54,7 +54,7 @@ class RetrofitSingleton private constructor() {
                     val low = 1831
                     if (newPrice <= low) {
                         showCustomNotification(BaseApplication.appContext!!, dataBean)
-                        MailHelper.sendWarningMail("WARNING",
+                        MailHelper.sendWarningMail("WARNING --> " + dataBean.stockName,
                             dataBean.stockName + " now is " + dataBean.newPrice + " < " + low)
                     }
                     stockResp.data
