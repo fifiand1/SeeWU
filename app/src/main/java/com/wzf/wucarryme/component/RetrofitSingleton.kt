@@ -3,13 +3,8 @@ package com.wzf.wucarryme.component
 import com.github.promeg.pinyinhelper.Pinyin
 import com.litesuits.orm.db.assit.WhereBuilder
 import com.wzf.wucarryme.base.BaseApplication
-import com.wzf.wucarryme.common.C
-import com.wzf.wucarryme.common.utils.LogUtil
-import com.wzf.wucarryme.common.utils.RxUtil
-import com.wzf.wucarryme.common.utils.ToastUtil
-import com.wzf.wucarryme.common.utils.Util
+import com.wzf.wucarryme.common.utils.*
 import com.wzf.wucarryme.component.NotificationHelper.showCustomNotification
-import com.wzf.wucarryme.modules.about.domain.Version
 import com.wzf.wucarryme.modules.main.domain.CityORM
 import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
@@ -48,14 +43,32 @@ class RetrofitSingleton private constructor() {
             sApiService.listStocks(random, codes, codeTypes)
                 .map { stockResp ->
                     LogUtil.i(TAG, stockResp.toString())
-                    val dataBean = stockResp.data[stockResp.data.size - 1]
-                    val newPrice = dataBean.newPrice!!.toFloat()
-                    LogUtil.i(TAG, newPrice.toString())
-                    val low = 1831
-                    if (newPrice <= low) {
-                        showCustomNotification(BaseApplication.appContext!!, dataBean)
-                        MailHelper.sendWarningMail("WARNING --> " + dataBean.stockName,
-                            dataBean.stockName + " now is " + dataBean.newPrice + " < " + low)
+
+                    stockResp.data.forEach {
+                        val stockName = it.stockName!!.trim()
+                        val other = SharedPreferenceUtil.instance.getString(
+                            SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
+                        if (other != "") {
+                            SharedPreferenceUtil.instance.putString(
+                                SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
+                            showCustomNotification(BaseApplication.appContext!!, it)
+                            val start = other.substring(0, 1)
+                            val end = other.substring(1)
+
+                            val alertPrice = end.toFloat()
+                            LogUtil.i(TAG, alertPrice.toString())
+                            if (start == "<") {
+                                if (it.newPrice!!.toFloat() <= alertPrice) {
+                                    MailHelper.sendWarningMail("WARNING --> " + it.stockName,
+                                        it.stockName + " now is " + it.newPrice + " < " + alertPrice)
+                                }
+                            } else {
+                                if (it.newPrice!!.toFloat() >= alertPrice) {
+                                    MailHelper.sendWarningMail("WARNING --> " + it.stockName,
+                                        it.stockName + " now is " + it.newPrice + " > " + alertPrice)
+                                }
+                            }
+                        }
                     }
                     stockResp.data
                 }
@@ -101,12 +114,6 @@ class RetrofitSingleton private constructor() {
             Observable.error(e)
         }
 
-    }
-
-    fun fetchVersion(): Observable<Version> {
-        return sApiService.mVersionAPI(C.API_TOKEN)
-            .doOnError { disposeFailureInfo(it) }
-            .compose(RxUtil.io())
     }
 
     companion object {

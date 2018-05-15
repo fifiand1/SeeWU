@@ -39,6 +39,11 @@ class SharedPreferenceUtil private constructor() {
         get() = mPrefs.getString(CITY_NAME, "北京")
         set(name) = mPrefs.edit().putString(CITY_NAME, name).apply()
 
+//    //自定义预警
+//    var alertStockName: String
+//        get(name) = mPrefs.getString(ALERT_STOCK_NAME+name, null)
+//        set(price) = mPrefs.edit().putString(ALERT_STOCK_NAME, price).apply()
+
     //  通知栏模式 默认为常驻
     var notificationModel: Int
         get() = mPrefs.getInt(NOTIFICATION_MODEL, Notification.FLAG_ONGOING_EVENT)
@@ -70,12 +75,12 @@ class SharedPreferenceUtil private constructor() {
         return mPrefs.getInt(key, defValue)
     }
 
-    fun putString(key: String, value: String?): SharedPreferenceUtil {
+    fun putString(key: String, value: String): SharedPreferenceUtil {
         mPrefs.edit().putString(key, value).apply()
         return this
     }
 
-    fun getString(key: String, defValue: String): String? {
+    fun getString(key: String, defValue: String): String {
         return mPrefs.getString(key, defValue)
     }
 
@@ -95,6 +100,7 @@ class SharedPreferenceUtil private constructor() {
     companion object {
 
         val CITY_NAME = "city_name" //选择城市
+        val ALERT_STOCK_NAME = "alert_stock_name" //选择城市
         val HOUR = "current_hour" //当前小时
 
         val CHANGE_ICONS = "change_icons" //切换图标

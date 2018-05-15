@@ -1,7 +1,6 @@
 package com.wzf.wucarryme.component
 
 import android.content.Context
-import com.wzf.wucarryme.common.utils.VersionUtil
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -45,12 +44,11 @@ class CrashHandler(context: Context) : Thread.UncaughtExceptionHandler {
      */
     private fun collectCrashDeviceInfo(): String {
 
-        val versionName = VersionUtil.getVersion(mContext)
         val model = android.os.Build.MODEL
         val androidVersion = android.os.Build.VERSION.RELEASE
         val manufacturer = android.os.Build.MANUFACTURER
 
-        return "$versionName  $model  $androidVersion  $manufacturer"
+        return "$model  $androidVersion  $manufacturer"
     }
 
     companion object {

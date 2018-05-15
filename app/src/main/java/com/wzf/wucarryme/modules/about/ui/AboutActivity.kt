@@ -15,7 +15,6 @@ import com.wzf.wucarryme.R
 import com.wzf.wucarryme.base.BaseActivity
 import com.wzf.wucarryme.common.utils.StatusBarUtil
 import com.wzf.wucarryme.common.utils.Util
-import com.wzf.wucarryme.common.utils.VersionUtil
 
 class AboutActivity : BaseActivity() {
 
@@ -41,7 +40,7 @@ class AboutActivity : BaseActivity() {
         setSupportActionBar(mToolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        mTvVersion.text = String.format("当前版本: %s (Build %s)", VersionUtil.getVersion(this), VersionUtil.getVersionCode(this))
+//        mTvVersion.text = String.format("当前版本: %s (Build %s)", VersionUtil.getVersion(this), VersionUtil.getVersionCode(this))
         mToolbarLayout.isTitleEnabled = false
         mToolbar.title = getString(R.string.app_name)
     }
