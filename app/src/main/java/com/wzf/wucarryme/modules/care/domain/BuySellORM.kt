@@ -57,7 +57,12 @@ class BuySellORM {
         this.logTime = logTime
     }
 
-    constructor() {
+    constructor()
 
+    override fun toString(): String {
+        return "$blogTime [$action] [$category]<br/>" +
+            "<table><tr><td>$count1</td><td>$stock1</td><td>$stock1Price</td><td>$stock1Return</td></tr>" +
+            "<tr><td>$count2</td><td>$stock2</td><td>$stock2Price</td><td>$stock2Return</td></tr></table>" +
+            "<br/>$desc<br/>$logTime"
     }
 }

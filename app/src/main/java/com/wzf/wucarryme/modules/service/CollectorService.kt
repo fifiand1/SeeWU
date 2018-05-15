@@ -9,6 +9,7 @@ import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.common.utils.StringUtil
 import com.wzf.wucarryme.common.utils.StringUtil.banKuai
 import com.wzf.wucarryme.common.utils.TimeUtil
+import com.wzf.wucarryme.component.MailHelper
 import com.wzf.wucarryme.component.NotificationHelper
 import com.wzf.wucarryme.component.OrmLite
 import com.wzf.wucarryme.component.RetrofitSingleton
@@ -16,6 +17,7 @@ import com.wzf.wucarryme.modules.care.domain.BuySellORM
 import com.wzf.wucarryme.modules.care.domain.CareORM
 import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -251,17 +253,25 @@ class CollectorService : Service() {
         buySellORM.blogTime = todayDate + blogTime
         buySellORM.logTime = nowYMDHMSTime
         buySellORM.desc = text
-        OrmLite.getInstance().insert(buySellORM)
+        insertBuySell(buySellORM)
         NotificationHelper.showPositioningNotification(this@CollectorService, buySellORM)
 
     }
 
-    private fun insertBuySell(strings: BuySellORM) {
+    private fun insertBuySell(it: BuySellORM) {
         try {
-            OrmLite.getInstance().insert(strings)
+            OrmLite.getInstance().insert(it)
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        Observable.create(ObservableOnSubscribe<Any> { emitter ->
+            //发个邮件吧
+            MailHelper.sendWarningMail(it.action!!, it.toString())
+            emitter.onComplete()
+        })
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
     private fun searchMaybeBought(s: String): List<BuySellORM> {
