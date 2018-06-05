@@ -183,6 +183,10 @@ class CollectorService : Service() {
                         val strings = searchMaybeBought(text)
                         val blogTime = StringUtil.getBlogTime(text)
                         for (item in strings) {
+                            if (item.stock1 == null) {
+                                insertBuySell(item)
+                                continue
+                            }
                             val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock1!!)
                             val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock2!!)
 

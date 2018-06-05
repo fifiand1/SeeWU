@@ -37,8 +37,8 @@ class RetrofitSingleton private constructor() {
         val random = Math.random().toString()
 //        val codes = "300443,603444,300628,002460,600518,601166,300583,300725,300528,1A0001,2A01,399006"
 //        val codeTypes = "4621,4353,4621,4614,4353,4353,4621,4621,4621,4352,4608,4608"
-        val codes = "603444,300628,300725,002460,300658,300649,300157,1A0001,2A01,399006"
-        val codeTypes = "4353,4621,4621,4614,4621,4621,4621,4352,4608,4608"
+        val codes = "603444,300628,300725,002460,300658,002424,300157,1A0001,2A01,399006"
+        val codeTypes = "4353,4621,4621,4614,4621,4614,4621,4352,4608,4608"
         return try {
             sApiService.listStocks(random, codes, codeTypes)
                 .map { stockResp ->
@@ -49,24 +49,23 @@ class RetrofitSingleton private constructor() {
                         val other = SharedPreferenceUtil.instance.getString(
                             SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
                         if (other != "") {
-                            SharedPreferenceUtil.instance.putString(
-                                SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
-                            showCustomNotification(BaseApplication.appContext!!, it)
                             val start = other.substring(0, 1)
                             val end = other.substring(1)
 
                             val alertPrice = end.toFloat()
                             LogUtil.i(TAG, alertPrice.toString())
-                            if (start == "<") {
-                                if (it.newPrice!!.toFloat() <= alertPrice) {
-                                    MailHelper.sendWarningMail("WARNING --> " + it.stockName,
-                                        it.stockName + " now is " + it.newPrice + " < " + alertPrice)
-                                }
-                            } else {
-                                if (it.newPrice!!.toFloat() >= alertPrice) {
-                                    MailHelper.sendWarningMail("WARNING --> " + it.stockName,
-                                        it.stockName + " now is " + it.newPrice + " > " + alertPrice)
-                                }
+                            var notify = ""
+                            if (start == "<" && it.newPrice!!.toFloat() <= alertPrice) {
+                                notify = " < "
+                            } else if (it.newPrice!!.toFloat() >= alertPrice) {
+                                notify = " > "
+                            }
+                            if (notify != "") {
+                                showCustomNotification(BaseApplication.appContext!!, it)
+                                MailHelper.sendWarningMail("WARNING --> " + it.stockName,
+                                    it.stockName + " now is " + it.newPrice + notify + alertPrice)
+                                SharedPreferenceUtil.instance.putString(
+                                    SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
                             }
                         }
                     }
@@ -94,7 +93,7 @@ class RetrofitSingleton private constructor() {
             sApiService.listWizard(nameEN)
                 .map { wizardResp ->
                     wizardResp.data.forEach {
-                        if (it.stockName != nameCN) {
+                        if (it.stockName.trim() != nameCN.trim()) {
                             wizardResp.data.remove(it)
                         }
                     }
