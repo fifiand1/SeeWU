@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.litesuits.orm.db.assit.QueryBuilder
+import com.litesuits.orm.db.model.ConflictAlgorithm
 import com.wzf.wucarryme.common.utils.LogUtil
 import com.wzf.wucarryme.common.utils.SharedPreferenceUtil
 import com.wzf.wucarryme.common.utils.StringUtil
@@ -15,6 +16,7 @@ import com.wzf.wucarryme.component.OrmLite
 import com.wzf.wucarryme.component.RetrofitSingleton
 import com.wzf.wucarryme.modules.care.domain.BuySellORM
 import com.wzf.wucarryme.modules.care.domain.CareORM
+import com.wzf.wucarryme.modules.care.domain.MailCacheORM
 import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
@@ -158,7 +160,8 @@ class CollectorService : Service() {
                                 }).subscribe {
                                     //插入数据
                                     print(TYPE_SELL, text)
-                                    val x = "$blogTime************************卖出参考************************"
+                                    val x = "$blogTime************************卖出参考(${item
+                                        .category})************************"
                                     print(TYPE_SELL, x)
                                     print(TYPE_SELL, "************************" + item.stock1 + item.stock1Price +
                                         "************************" + item.stock1Return)
@@ -196,7 +199,7 @@ class CollectorService : Service() {
                                 item.stock2Price = t2.newPrice
                                 return@BiFunction item
                             }).subscribe {
-                                val x = "$blogTime************************买入选择************************"
+                                val x = "$blogTime************************买入选择(${item.category})************************"
                                 print(TYPE_BUY, x)
                                 print(TYPE_BUY, "************************" + item.stock1 + item.stock1Price +
                                     "************************" + item.count1)
@@ -271,7 +274,12 @@ class CollectorService : Service() {
 
         Observable.create(ObservableOnSubscribe<Any> { emitter ->
             //发个邮件吧
-            MailHelper.sendWarningMail(it.action!!, it.toString())
+            val cache = MailCacheORM(it.blogTime, it.desc, it.toString(), TimeUtil.nowYMDHMSTime)
+            val result = OrmLite.getInstance().insert(cache, ConflictAlgorithm.Ignore)
+            LogUtil.d(TAG, "insert MailCache result:$result")
+            if (result > -1) {
+                MailHelper.sendWarningMail(it.action!!, it.toString())
+            }
             emitter.onComplete()
         })
             .subscribeOn(Schedulers.io())
@@ -304,12 +312,15 @@ class CollectorService : Service() {
             buySellORM.category = bankuai
             buySellORM.logTime = nowYMDHMSTime
             buySellORM.desc = s
+
+            val somedaysAgo = TimeUtil.beforeNowYMDHMSTime(-60)
             try {
 
                 var like = "CATEGORY_ like '%$bankuai'"
                 var sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
-                    "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
-                    "GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
+                    " select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
+                    " and LOG_TIME >='" + somedaysAgo + "'" +
+                    " GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
                 LogUtil.d(TAG, "searchMaybeBought() sql = [$sql]")
                 var readableDatabase = OrmLite.getInstance().readableDatabase
                 var cursor = readableDatabase.rawQuery(sql, null)
@@ -453,10 +464,10 @@ class CollectorService : Service() {
         const val TITLE = "wu2198股市直播"
         const val url = "http://blog.sina.com.cn/u/1216826604"
         const val CONTENT_ID = "sina_keyword_ad_area2"
-        val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%")
-        val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "减掉.*%")
+        val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%", "接回.*%")
+        val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%", "减掉.*%")
         val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "仓位是零", "仓位暂时是零")
-        val CARE_REG = arrayOf("领先.*股", "领先.*板", "等.*股继续领先", "出现冲涨停", "目前具有上涨", "目前涨停", "目前领先", "出现涨停", "改写了新高", "等领先")
+        val CARE_REG = arrayOf("领先.*股", "领先.*板", "等.*股继续领先", "冲涨停", "目前具有上涨", "目前涨停", "目前领先", "出现涨停", "改写了新高", "等领先")
 
         val collectDate = arrayOf<String>()
         val collectURL = arrayOf<String>()

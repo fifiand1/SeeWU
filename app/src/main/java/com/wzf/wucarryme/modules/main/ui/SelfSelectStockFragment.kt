@@ -129,7 +129,7 @@ class SelfSelectStockFragment : BaseFragment() {
             //            .take(3)
             .doOnSubscribe { mRefreshLayout.isRefreshing = true }
             .flatMap<Any> { aLong ->
-                LogUtil.i(TAG, Thread.currentThread().name + " flatMap " + aLong)
+                LogUtil.d(TAG, Thread.currentThread().name + " flatMap " + aLong)
                 if (TimeUtil.isKP || mStocks!!.size == 0) {
                     return@flatMap RetrofitSingleton.instance.fetchStocks()
                 }

@@ -1,11 +1,10 @@
 package com.wzf.wucarryme.component
 
 import com.github.promeg.pinyinhelper.Pinyin
-import com.litesuits.orm.db.assit.WhereBuilder
 import com.wzf.wucarryme.base.BaseApplication
 import com.wzf.wucarryme.common.utils.*
 import com.wzf.wucarryme.component.NotificationHelper.showCustomNotification
-import com.wzf.wucarryme.modules.main.domain.CityORM
+import com.wzf.wucarryme.modules.care.domain.MailCacheORM
 import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
@@ -37,12 +36,14 @@ class RetrofitSingleton private constructor() {
         val random = Math.random().toString()
 //        val codes = "300443,603444,300628,002460,600518,601166,300583,300725,300528,1A0001,2A01,399006"
 //        val codeTypes = "4621,4353,4621,4614,4353,4353,4621,4621,4621,4352,4608,4608"
-        val codes = "603444,300628,300725,002460,300658,002424,300157,1A0001,2A01,399006"
-        val codeTypes = "4353,4621,4621,4614,4621,4614,4621,4352,4608,4608"
+//        val codes = "603444,300628,300725,002460,300658,002424,300157,1A0001,2A01,399006"
+//        val codeTypes = "4353,4621,4621,4614,4621,4614,4621,4352,4608,4608"
+        val codes = "603596,600036,1A0001,2A01,399006"
+        val codeTypes = "4353,4353,4352,4608,4608"
         return try {
             sApiService.listStocks(random, codes, codeTypes)
                 .map { stockResp ->
-                    LogUtil.i(TAG, stockResp.toString())
+                    LogUtil.d(TAG, stockResp.toString())
 
                     stockResp.data.forEach {
                         val stockName = it.stockName!!.trim()
@@ -62,10 +63,14 @@ class RetrofitSingleton private constructor() {
                             }
                             if (notify != "") {
                                 showCustomNotification(BaseApplication.appContext!!, it)
-                                MailHelper.sendWarningMail("WARNING --> " + it.stockName,
-                                    it.stockName + " now is " + it.newPrice + notify + alertPrice)
+                                val title = "WARNING --> " + it.stockName
+                                val content = it.stockName + " now is " + it.newPrice + notify + alertPrice
+                                MailHelper.sendWarningMail(title,
+                                    content)
+                                val cache = MailCacheORM(null, null, content, TimeUtil.nowYMDHMSTime)
                                 SharedPreferenceUtil.instance.putString(
                                     SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
+                                OrmLite.getInstance().save(cache)
                             }
                         }
                     }
@@ -198,8 +203,8 @@ class RetrofitSingleton private constructor() {
                     t.toString().contains("UnknownHostException")) {
                     ToastUtil.showShort("网络问题")
                 } else if (t.toString().contains("API没有")) {
-                    OrmLite.getInstance().delete(WhereBuilder(CityORM::class.java).where("name=?",
-                        Util.replaceInfo(t.message)))
+//                    OrmLite.getInstance().delete(WhereBuilder(CityORM::class.java).where("name=?",
+//                        Util.replaceInfo(t.message)))
                     ToastUtil.showShort("错误: " + t.message)
                 }
                 throwable.printStackTrace()

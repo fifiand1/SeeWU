@@ -31,6 +31,19 @@ object TimeUtil {
         }
 
     /**
+     * yyyy-MM-dd HH:mm:ss
+     */
+    fun beforeNowYMDHMSTime(days: Int): String {
+        val mDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        var da = Date()//获取当前时间
+        val calendar = Calendar.getInstance() //得到日历
+        calendar.time = da//把当前时间赋给日历
+        calendar.add(Calendar.DATE, days)  //设置为前2月
+        da = calendar.time//获取2个月前的时间
+        return mDateFormat.format(da)
+    }
+
+    /**
      * MM-dd HH:mm:ss
      */
     val nowMDHMSTime: String
