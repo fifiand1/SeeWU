@@ -17,6 +17,7 @@ import com.wzf.wucarryme.component.RetrofitSingleton
 import com.wzf.wucarryme.modules.care.domain.BuySellORM
 import com.wzf.wucarryme.modules.care.domain.CareORM
 import com.wzf.wucarryme.modules.care.domain.MailCacheORM
+import com.wzf.wucarryme.modules.main.domain.Sentence
 import com.wzf.wucarryme.modules.main.domain.StockResp
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
@@ -39,11 +40,11 @@ class CollectorService : Service() {
     private var todayDate = ""
     private var todayURL = ""
     private lateinit var doc: Document
-    private var storedBought: MutableList<String> = ArrayList()
-    private var storedSold: MutableList<String> = ArrayList()
-    private var storedSpace: MutableList<String> = ArrayList()
-    private var storedCare: MutableList<String> = ArrayList()
-    private var storedNormal: MutableList<String> = ArrayList()
+    private var storedBought: MutableList<Sentence> = ArrayList()
+    private var storedSold: MutableList<Sentence> = ArrayList()
+    private var storedSpace: MutableList<Sentence> = ArrayList()
+    private var storedCare: MutableList<Sentence> = ArrayList()
+    private var storedNormal: MutableList<Sentence> = ArrayList()
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         synchronized(this) {
@@ -111,18 +112,18 @@ class CollectorService : Service() {
             val content = doc.getElementById(CONTENT_ID)
             val p = content.getElementsByTag("p")
             for (element in p) {
-                val text = element.text()
+                val text = Sentence(element.text())
                 //                LogUtil.i(TAG, "get one-> " + text);
 
-                val care = important(text, CARE_REG)
+                val care = important(text.value, CARE_REG)
 
                 //卖出
-                if (important(text, SELL_REG) != null) {
+                if (important(text.value, SELL_REG) != null) {
                     if (!storedSold.contains(text)) {
                         storedSold.add(text)
 
-                        val insertExcelSELL = insertExcelSELL(text)
-                        val blogTime = StringUtil.getBlogTime(text)
+                        val insertExcelSELL = insertExcelSELL(text.value)
+                        val blogTime = StringUtil.getBlogTime(text.value)
                         for (item in insertExcelSELL) {
                             // TODO: 2018/5/9 仓位%暂时不管
                             //找出当时买的
@@ -159,7 +160,7 @@ class CollectorService : Service() {
                                     return@BiFunction item
                                 }).subscribe {
                                     //插入数据
-                                    print(TYPE_SELL, text)
+                                    print(TYPE_SELL, text.value)
                                     val x = "$blogTime************************卖出参考(${item
                                         .category})************************"
                                     print(TYPE_SELL, x)
@@ -172,19 +173,19 @@ class CollectorService : Service() {
                                 }
                             } else {
                                 //没找到之前记录 直接插入
-                                print(TYPE_SELL, text)
+                                print(TYPE_SELL, text.value)
                                 insertBuySell(item)
                             }
 
                         }
                     }
-                } else if (important(text, BUY_REG) != null) {
+                } else if (important(text.value, BUY_REG) != null) {
                     //买入
                     if (!storedBought.contains(text)) {
                         storedBought.add(text)
-                        print(TYPE_BUY, text)
-                        val strings = searchMaybeBought(text)
-                        val blogTime = StringUtil.getBlogTime(text)
+                        print(TYPE_BUY, text.value)
+                        val strings = searchMaybeBought(text.value)
+                        val blogTime = StringUtil.getBlogTime(text.value)
                         for (item in strings) {
                             if (item.stock1 == null) {
                                 insertBuySell(item)
@@ -211,23 +212,23 @@ class CollectorService : Service() {
 
                         }
                     }
-                } else if (important(text, SPACE_REG) != null) {
+                } else if (important(text.value, SPACE_REG) != null) {
                     //仓位
                     if (!storedSpace.contains(text)) {
                         storedSpace.add(text)
-                        print(TYPE_POSITION, text)
-                        insertPosition(text)
+                        print(TYPE_POSITION, text.value)
+                        insertPosition(text.value)
                     }
                 } else if (care != null) {
                     if (!storedCare.contains(text)) {
                         storedCare.add(text)
-                        print(TYPE_CARE, text)
-                        insertCare(text, care)
+                        print(TYPE_CARE, text.value)
+                        insertCare(text.value, care)
                     }
                 } else {
                     if (!storedNormal.contains(text)) {
                         storedNormal.add(text)
-                        LogUtil.w(TAG, text)
+                        LogUtil.w(TAG, text.value)
                     }
                 }
             }

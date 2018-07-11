@@ -104,8 +104,9 @@ dependencies {
     //chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
-    //pinyin
+    //语言类
     implementation 'com.github.promeg:tinypinyin:2.0.3' // TinyPinyin核心包，约80KB
+    implementation 'info.debatty:java-string-similarity:1.1.0'
 
 }
 repositories {
