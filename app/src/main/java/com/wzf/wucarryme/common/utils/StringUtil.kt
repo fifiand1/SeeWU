@@ -1,7 +1,6 @@
 package com.wzf.wucarryme.common.utils
 
-import java.util.ArrayList
-import java.util.Arrays
+import java.util.*
 
 /**
  * @author wzf
@@ -24,12 +23,16 @@ object StringUtil {
         return str
     }
 
-    fun getBlogTime(p: String): String {
-        var blogTime = ""
+    fun getBlogTime(p: String): String? {
+        val blogTime: String?
         p.replace("[\\u00A0]+", " ")
 //        val endIndex = if (p.contains(" ")) p.indexOf(" ") else p.indexOf(160)
         val endIndex = p.indexOf(" ")
-        blogTime = p.substring(0, endIndex)
+        blogTime = try {
+            p.substring(0, endIndex)
+        } catch (e: Exception) {
+            null
+        }
         return blogTime
     }
 

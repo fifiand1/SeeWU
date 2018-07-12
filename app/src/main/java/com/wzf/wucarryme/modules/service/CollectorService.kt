@@ -114,122 +114,27 @@ class CollectorService : Service() {
             for (element in p) {
                 val text = Sentence(element.text())
                 //                LogUtil.i(TAG, "get one-> " + text);
+                val sell = important(text.value, SELL_REG)
+                val buy = important(text.value, BUY_REG)
 
-                val care = important(text.value, CARE_REG)
-
-                //卖出
-                if (important(text.value, SELL_REG) != null) {
-                    if (!storedSold.contains(text)) {
-                        storedSold.add(text)
-
-                        val insertExcelSELL = insertExcelSELL(text.value)
-                        val blogTime = StringUtil.getBlogTime(text.value)
-                        for (item in insertExcelSELL) {
-                            // TODO: 2018/5/9 仓位%暂时不管
-                            //找出当时买的
-                            val query = OrmLite.getInstance().query(QueryBuilder(BuySellORM::class.java)
-                                .where("CATEGORY_ = ? AND ACTION_ = ?", item.category, CollectorService.TYPE_BUY)
-                                .appendOrderDescBy("ID_").limit("1"))
-
-                            if (query.size > 0 && query[0].stock1 != null) {
-                                //得到现在价格
-                                val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock1!!)
-                                val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock2!!)
-
-                                Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
-                                .DataBean, BuySellORM> { t1, t2 ->
-                                    item.stock1 = t1.stockName
-                                    item.stock1Price = t1.newPrice
-                                    item.stock2 = t2.stockName
-                                    item.stock2Price = t2.newPrice
-                                    //计算收益
-                                    val lastBuyPrice = query[0].stock1Price
-                                    if (lastBuyPrice != null) {
-                                        item.stock1Return = String.format(Locale.CHINA,
-                                            "%.2f",
-                                            (t1.newPrice!!.toFloat() - lastBuyPrice.toFloat())
-                                                / lastBuyPrice.toFloat() * 100) + "%"
-                                    }
-                                    val lastBuyPrice2 = query[0].stock2Price
-                                    if (lastBuyPrice2 != null) {
-                                        item.stock2Return = String.format(Locale.CHINA,
-                                            "%.2f",
-                                            (t2.newPrice!!.toFloat() - lastBuyPrice2.toFloat())
-                                                / lastBuyPrice2.toFloat() * 100) + "%"
-                                    }
-                                    return@BiFunction item
-                                }).subscribe {
-                                    //插入数据
-                                    print(TYPE_SELL, text.value)
-                                    val x = "$blogTime************************卖出参考(${item
-                                        .category})************************"
-                                    print(TYPE_SELL, x)
-                                    print(TYPE_SELL, "************************" + item.stock1 + item.stock1Price +
-                                        "************************" + item.stock1Return)
-                                    print(TYPE_SELL, "************************" + item.stock2 + item.stock2Price +
-                                        "************************" + item.stock2Return)
-                                    print(TYPE_SELL, x)
-                                    insertBuySell(item)
-                                }
-                            } else {
-                                //没找到之前记录 直接插入
-                                print(TYPE_SELL, text.value)
-                                insertBuySell(item)
-                            }
-
+                // FIXME: 2018/7/12 单条信息同时包含buy sell，简单处理
+                //"9:30 借高开兑现20%医药股(挂单成交),昨日冲涨停今天高看吃肉走人.买进20%通信股"
+                if (buy != null && sell != null) {
+                    val split = text.value.split(".")
+                    var blogTime1 = ""
+                    split.forEach {
+                        val blogTime = StringUtil.getBlogTime(it)
+                        var fixedText = it
+                        //后面的会获取不到时间，强行把内容变成两条
+                        if (blogTime == null) {
+                            fixedText = "$blogTime1 $fixedText"
+                        } else {
+                            blogTime1 = blogTime
                         }
-                    }
-                } else if (important(text.value, BUY_REG) != null) {
-                    //买入
-                    if (!storedBought.contains(text)) {
-                        storedBought.add(text)
-                        print(TYPE_BUY, text.value)
-                        val strings = searchMaybeBought(text.value)
-                        val blogTime = StringUtil.getBlogTime(text.value)
-                        for (item in strings) {
-                            if (item.stock1 == null) {
-                                insertBuySell(item)
-                                continue
-                            }
-                            val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock1!!)
-                            val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock2!!)
-
-                            Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
-                            .DataBean, BuySellORM> { t1, t2 ->
-                                item.stock1Price = t1.newPrice
-                                item.stock2Price = t2.newPrice
-                                return@BiFunction item
-                            }).subscribe {
-                                val x = "$blogTime************************买入选择(${item.category})************************"
-                                print(TYPE_BUY, x)
-                                print(TYPE_BUY, "************************" + item.stock1 + item.stock1Price +
-                                    "************************" + item.count1)
-                                print(TYPE_BUY, "************************" + item.stock2 + item.stock2Price +
-                                    "************************" + item.count2)
-                                print(TYPE_BUY, x)
-                                insertBuySell(item)
-                            }
-
-                        }
-                    }
-                } else if (important(text.value, SPACE_REG) != null) {
-                    //仓位
-                    if (!storedSpace.contains(text)) {
-                        storedSpace.add(text)
-                        print(TYPE_POSITION, text.value)
-                        insertPosition(text.value)
-                    }
-                } else if (care != null) {
-                    if (!storedCare.contains(text)) {
-                        storedCare.add(text)
-                        print(TYPE_CARE, text.value)
-                        insertCare(text.value, care)
+                        analyses(Sentence(fixedText))
                     }
                 } else {
-                    if (!storedNormal.contains(text)) {
-                        storedNormal.add(text)
-                        LogUtil.w(TAG, text.value)
-                    }
+                    analyses(text)
                 }
             }
         } catch (e: Exception) {
@@ -239,6 +144,136 @@ class CollectorService : Service() {
             e.printStackTrace()
         }
 
+    }
+
+    private fun analyses(text: Sentence) {
+        var normalInfo = true
+        val care = important(text.value, CARE_REG)
+        val sell = important(text.value, SELL_REG)
+        val buy = important(text.value, BUY_REG)
+        //卖出
+        if (sell != null) {
+            normalInfo = false
+            if (!storedSold.contains(text)) {
+                storedSold.add(text)
+                print(TYPE_SELL, text.value)
+
+                val insertExcelSELL = insertExcelSELL(text.value)
+                val blogTime = StringUtil.getBlogTime(text.value)
+                for (item in insertExcelSELL) {
+                    // TODO: 2018/5/9 仓位%暂时不管
+                    //找出当时买的
+                    val query = OrmLite.getInstance().query(QueryBuilder(BuySellORM::class.java)
+                        .where("CATEGORY_ = ? AND ACTION_ = ?", item.category, CollectorService.TYPE_BUY)
+                        .appendOrderDescBy("ID_").limit("1"))
+
+                    if (query.size > 0 && query[0].stock1 != null) {
+                        //得到现在价格
+                        val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock1!!)
+                        val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock2!!)
+
+                        Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
+                        .DataBean, BuySellORM> { t1, t2 ->
+                            item.stock1 = t1.stockName
+                            item.stock1Price = t1.newPrice
+                            item.stock2 = t2.stockName
+                            item.stock2Price = t2.newPrice
+                            //计算收益
+                            val lastBuyPrice = query[0].stock1Price
+                            if (lastBuyPrice != null) {
+                                item.stock1Return = String.format(Locale.CHINA,
+                                    "%.2f",
+                                    (t1.newPrice!!.toFloat() - lastBuyPrice.toFloat())
+                                        / lastBuyPrice.toFloat() * 100) + "%"
+                            }
+                            val lastBuyPrice2 = query[0].stock2Price
+                            if (lastBuyPrice2 != null) {
+                                item.stock2Return = String.format(Locale.CHINA,
+                                    "%.2f",
+                                    (t2.newPrice!!.toFloat() - lastBuyPrice2.toFloat())
+                                        / lastBuyPrice2.toFloat() * 100) + "%"
+                            }
+                            return@BiFunction item
+                        }).subscribe {
+                            //插入数据
+                            val x = "$blogTime************************卖出参考(${item
+                                .category})************************"
+                            print(TYPE_SELL, x)
+                            print(TYPE_SELL, "************************" + item.stock1 + item.stock1Price +
+                                "************************" + item.stock1Return)
+                            print(TYPE_SELL, "************************" + item.stock2 + item.stock2Price +
+                                "************************" + item.stock2Return)
+                            print(TYPE_SELL, x)
+                            insertBuySell(item)
+                        }
+                    } else {
+                        //没找到之前记录 直接插入
+                        val x = "$blogTime************************卖出参考null(${item
+                            .category})************************"
+                        print(TYPE_SELL, x)
+                        insertBuySell(item)
+                    }
+
+                }
+            }
+        }
+        //买入
+        if (buy != null) {
+            normalInfo = false
+            if (!storedBought.contains(text)) {
+                storedBought.add(text)
+                print(TYPE_BUY, text.value)
+                val strings = searchMaybeBought(text.value)
+                val blogTime = StringUtil.getBlogTime(text.value)
+                for (item in strings) {
+                    if (item.stock1 == null) {
+                        insertBuySell(item)
+                        continue
+                    }
+                    val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock1!!)
+                    val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock2!!)
+
+                    Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
+                    .DataBean, BuySellORM> { t1, t2 ->
+                        item.stock1Price = t1.newPrice
+                        item.stock2Price = t2.newPrice
+                        return@BiFunction item
+                    }).subscribe {
+                        val x = "$blogTime************************买入选择(${item.category})************************"
+                        print(TYPE_BUY, x)
+                        print(TYPE_BUY, "************************" + item.stock1 + item.stock1Price +
+                            "************************" + item.count1)
+                        print(TYPE_BUY, "************************" + item.stock2 + item.stock2Price +
+                            "************************" + item.count2)
+                        print(TYPE_BUY, x)
+                        insertBuySell(item)
+                    }
+
+                }
+            }
+        }
+        //仓位
+        if (important(text.value, SPACE_REG) != null) {
+            normalInfo = false
+            if (!storedSpace.contains(text)) {
+                storedSpace.add(text)
+                print(TYPE_POSITION, text.value)
+                insertPosition(text.value)
+            }
+        }
+        if (care != null) {
+            normalInfo = false
+            if (!storedCare.contains(text)) {
+                storedCare.add(text)
+                print(TYPE_CARE, text.value)
+                insertCare(text.value, care)
+            }
+        }
+
+        if (normalInfo && !storedNormal.contains(text)) {
+            storedNormal.add(text)
+            LogUtil.w(TAG, text.value)
+        }
     }
 
     private fun insertPosition(text: String) {
@@ -466,7 +501,9 @@ class CollectorService : Service() {
         const val url = "http://blog.sina.com.cn/u/1216826604"
         const val CONTENT_ID = "sina_keyword_ad_area2"
         val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%", "接回.*%")
-        val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%", "减掉.*%")
+        val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%",
+            "减掉" +
+                ".*%")
         val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "仓位是零", "仓位暂时是零")
         val CARE_REG = arrayOf("领先.*股", "领先.*板", "等.*股继续领先", "冲涨停", "目前具有上涨", "目前涨停", "目前领先", "出现涨停", "改写了新高", "等领先")
 

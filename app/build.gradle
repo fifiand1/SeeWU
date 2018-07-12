@@ -108,6 +108,8 @@ dependencies {
     implementation 'com.github.promeg:tinypinyin:2.0.3' // TinyPinyin核心包，约80KB
     implementation 'info.debatty:java-string-similarity:1.1.0'
 
+    //test
+    testImplementation 'junit:junit:4.12'
 }
 repositories {
     mavenCentral()
