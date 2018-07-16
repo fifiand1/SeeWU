@@ -57,14 +57,18 @@ class CollectorService : Service() {
                         .observeOn(Schedulers.io())
                         .doOnSubscribe { disposable ->
                             LogUtil.d(TAG, "jsoup TodayURL " + Thread.currentThread().name)
+                            jsoupTodayURL()
+                            /*有时开盘了还没有开始直播
                             if (!jsoupTodayURL()) {
                                 disposable.dispose()
-                            }
+                            }*/
                         }
                         .doOnNext { aLong ->
                             LogUtil.d(TAG, aLong.toString() + "jsoup Article " + Thread.currentThread().name)
                             mIsUnSubscribed = false
-                            if (TimeUtil.isKP || storedNormal.size == 0) {
+                            if (todayURL == "") {
+                                jsoupTodayURL()
+                            } else if (TimeUtil.isKP || storedNormal.size == 0) {
                                 //app居然一直在后台没被杀死
                                 if (todayDate != TimeUtil.nowYueRi) {
                                     jsoupTodayURL()
@@ -330,7 +334,11 @@ class CollectorService : Service() {
         while (m.find()) {
             val group = m.group()
             //            result.put(group.substring(1,group.length()-1),null);
-            bankuaiList.add(group.substring(1, group.length - 1))
+            var bankuai = group.substring(1, group.length - 1)
+            if (bankuai.length > 4) {
+                bankuai = bankuai.substring(bankuai.length - 4, bankuai.length)
+            }
+            bankuaiList.add(bankuai)
         }
         if (bankuaiList.size == 0) {
             bankuaiList.add(s.substring(s.indexOf("%") + 1))
@@ -354,7 +362,8 @@ class CollectorService : Service() {
 
                 var like = "CATEGORY_ like '%$bankuai'"
                 var sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
-                    " select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
+                    " select DISTINCT STOCK_NAME FROM CARE_ where " + like +
+                    " and LOG_TIME >='" + somedaysAgo + "'" + ")" +
                     " and LOG_TIME >='" + somedaysAgo + "'" +
                     " GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
                 LogUtil.d(TAG, "searchMaybeBought() sql = [$sql]")

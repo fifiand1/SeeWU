@@ -121,7 +121,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         SharedPreferenceUtil.instance.putInt("SELL", R.mipmap.ic_event_busy_black_36dp)
         SharedPreferenceUtil.instance.putInt("POS", R.mipmap.ic_event_note_black_36dp)
 //        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "创业板指", "<1836")
-//        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "上证指数", "<3136")
+        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "上证指数", "<2786")
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

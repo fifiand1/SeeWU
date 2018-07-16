@@ -56,14 +56,15 @@ class RetrofitSingleton private constructor() {
                             val end = other.substring(1)
 
                             val alertPrice = end.toFloat()
-                            LogUtil.i(TAG, alertPrice.toString())
+                            LogUtil.v(TAG, other + "?" + it.newPrice)
                             var notify = ""
                             if (start == "<" && it.newPrice!!.toFloat() <= alertPrice) {
                                 notify = " < "
-                            } else if (it.newPrice!!.toFloat() >= alertPrice) {
+                            } else if (start == ">" && it.newPrice!!.toFloat() >= alertPrice) {
                                 notify = " > "
                             }
                             if (notify != "") {
+                                LogUtil.d(TAG, other + "?" + it.newPrice)
                                 showCustomNotification(BaseApplication.appContext!!, it)
                                 val title = "WARNING --> " + it.stockName
                                 val content = it.stockName + " now is " + it.newPrice + notify + alertPrice
