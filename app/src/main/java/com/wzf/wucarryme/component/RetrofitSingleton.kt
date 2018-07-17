@@ -70,7 +70,8 @@ class RetrofitSingleton private constructor() {
                                 val content = it.stockName + " now is " + it.newPrice + notify + alertPrice
                                 MailHelper.sendWarningMail(title,
                                     content)
-                                val cache = MailCacheORM(null, null, content, TimeUtil.nowYMDHMSTime)
+                                val logTime = TimeUtil.nowYMDHMSTime
+                                val cache = MailCacheORM(logTime, null, content, logTime)
                                 SharedPreferenceUtil.instance.putString(
                                     SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
                                 OrmLite.getInstance().save(cache)
