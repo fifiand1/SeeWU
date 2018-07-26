@@ -68,8 +68,7 @@ class RetrofitSingleton private constructor() {
                                 showCustomNotification(BaseApplication.appContext!!, it)
                                 val title = "WARNING --> " + it.stockName
                                 val content = it.stockName + " now is " + it.newPrice + notify + alertPrice
-                                MailHelper.sendWarningMail(title,
-                                    content)
+                                MailHelper.sendWarningMail(title, content)
                                 val logTime = TimeUtil.nowYMDHMSTime
                                 val cache = MailCacheORM(logTime, null, content, logTime)
                                 SharedPreferenceUtil.instance.putString(
@@ -111,11 +110,17 @@ class RetrofitSingleton private constructor() {
                 }
                 .flatMap {
                     LogUtil.d(TAG, "fetchStockByNameCN flatMap: $it")
+                    if (it.data == null || it.data.size == 0) {
+                        return@flatMap Observable.just(it)
+                    }
                     // FIXME: 2018/5/9 没有找到历史价格接口, 暂时先用当前价格
                     sApiService.listStocks(random, it.data!!.peek().stockCode, it.data!!.peek().codeType)
                 }
                 .map {
-                    it.data[0]
+                    if (it is StockResp) {
+                        return@map it.data[0]
+                    }
+                    StockResp.DataBean()
                 }
                 .doOnError { t -> disposeFailureInfo(t) }
                 .compose(RxUtil.io())

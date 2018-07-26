@@ -87,7 +87,7 @@ class CollectorService : Service() {
     private fun jsoupTodayURL(): Boolean {
         try {
             todayDate = TimeUtil.nowYueRi
-//            todayDate = "5月8日"
+//            todayDate = "7月12日"
             doc = Jsoup.connect(url).get()
             val elementsByAttributeValue = doc.getElementsByAttributeValue("class", "blog_title_h")
             for (element in elementsByAttributeValue) {
@@ -103,7 +103,6 @@ class CollectorService : Service() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         LogUtil.i(TAG, "today URL -> $todayURL")
         return "" != todayURL
     }
@@ -142,10 +141,10 @@ class CollectorService : Service() {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            LogUtil.w(TAG, "jsoupArticle exception: " + e.message)
         } catch (e: Error) {
             // jsoup 的 Exception 类型都是 Error
-            e.printStackTrace()
+            LogUtil.w(TAG, "jsoupArticle error: " + e.message)
         }
 
     }
@@ -372,8 +371,10 @@ class CollectorService : Service() {
                 if (cursor.count < 1) {
                     like = StringUtil.genLike("CATEGORY_", bankuai)
                     sql = "SELECT STOCK_NAME,count(*) as c FROM CARE_ where STOCK_NAME in(" +
-                        "   select DISTINCT STOCK_NAME FROM CARE_ where " + like + ")" +
-                        "GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
+                        " select DISTINCT STOCK_NAME FROM CARE_ where " + like +
+                        " and LOG_TIME >='" + somedaysAgo + "'" + ")" +
+                        " and LOG_TIME >='" + somedaysAgo + "'" +
+                        " GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
                     LogUtil.d(TAG, "searchMaybeBought() sql = [$sql]")
                     readableDatabase = OrmLite.getInstance().readableDatabase
                     cursor = readableDatabase.rawQuery(sql, null)
@@ -510,7 +511,7 @@ class CollectorService : Service() {
         const val url = "http://blog.sina.com.cn/u/1216826604"
         const val CONTENT_ID = "sina_keyword_ad_area2"
         val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%", "接回.*%")
-        val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%",
+        val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "T掉.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%",
             "减掉" +
                 ".*%")
         val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "仓位是零", "仓位暂时是零")
