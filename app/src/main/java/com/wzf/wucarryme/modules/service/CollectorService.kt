@@ -89,7 +89,7 @@ class CollectorService : Service() {
             todayDate = TimeUtil.nowYueRi
 //            todayDate = "7月12日"
             doc = Jsoup.connect(url).get()
-            val elementsByAttributeValue = doc.getElementsByAttributeValue("class", "blog_title_h")
+            val elementsByAttributeValue = doc.getElementsByAttributeValue("class", "blog_title")
             for (element in elementsByAttributeValue) {
                 val a = element.getElementsByTag("a")
                 val element1 = a[0]
