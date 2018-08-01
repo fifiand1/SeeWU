@@ -313,7 +313,7 @@ class CollectorService : Service() {
 
         Observable.create(ObservableOnSubscribe<Any> { emitter ->
             //发个邮件吧
-            val cache = MailCacheORM(it.blogTime, it.desc, it.toString(), TimeUtil.nowYMDHMSTime)
+            val cache = MailCacheORM(it.blogTime, it.category + it.desc, it.toString(), TimeUtil.nowYMDHMSTime)
             val result = OrmLite.getInstance().insert(cache, ConflictAlgorithm.Ignore)
             LogUtil.d(TAG, "insert MailCache result:$result")
             if (result > -1) {
