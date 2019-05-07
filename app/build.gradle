@@ -9,7 +9,6 @@ android {
     def app = rootProject.ext.android
 
     compileSdkVersion app.compileSdkVersion
-    buildToolsVersion app.buildToolsVersion
 
     defaultConfig {
         applicationId app.applicationId

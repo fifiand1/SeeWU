@@ -48,7 +48,7 @@ class RetrofitSingleton private constructor() {
                     LogUtil.d(TAG, stockResp.toString())
 
                     stockResp.data.forEach {
-                        val stockName = it.stockName!!.trim()
+                        val stockName = it.stockName?.trim()
                         val other = SharedPreferenceUtil.instance.getString(
                             SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
                         if (other != "") {

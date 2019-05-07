@@ -12,12 +12,16 @@ class Sentence(var value: String) {
         if (other is Sentence) {
             val jw = JaroWinkler()
             val similarity = jw.similarity(this.value, other.value)
-            return similarity > 0.8
+            return similarity > 0.98
         }
         return super.equals(other)
     }
 
     override fun hashCode(): Int {
         return value.hashCode()
+    }
+
+    override fun toString(): String {
+        return value
     }
 }

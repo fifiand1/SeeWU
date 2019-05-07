@@ -3,6 +3,7 @@ package com.wzf.wucarryme.modules.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.google.gson.JsonParser
 import com.litesuits.orm.db.assit.QueryBuilder
 import com.litesuits.orm.db.model.ConflictAlgorithm
 import com.wzf.wucarryme.common.utils.LogUtil
@@ -29,6 +30,7 @@ import org.jsoup.nodes.Document
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
+import kotlin.collections.HashMap
 
 //6月2日10:00
 
@@ -75,6 +77,7 @@ class CollectorService : Service() {
                                 }
                                 jsoupArticle()
                             }
+                            jsoupWeiboArticle()
                         }
                         .subscribeOn(Schedulers.io())
                         .subscribe()
@@ -92,11 +95,16 @@ class CollectorService : Service() {
             val elementsByAttributeValue = doc.getElementsByAttributeValue("class", "blog_title")
             for (element in elementsByAttributeValue) {
                 val a = element.getElementsByTag("a")
+                val time = element.nextElementSibling().textNodes()[0].text()
                 val element1 = a[0]
-                val data = element1.text()
+                val title = element1.text()
+                //<span class="time SG_txtc">(2019-03-29 14:47)</span>
+                LogUtil.d(TAG, "blog title: $title $time")
+                val it = BuySellORM(time, "", TYPE_CARE, "", "", title + a.attr("href"), todayDate)
+                sendMail(it)
 
                 //5月17日wu2198股市直播
-                if (data == todayDate + TITLE) {
+                if (title == todayDate + TITLE) {
                     todayURL = element1.attr("href")
                 }
             }
@@ -149,6 +157,58 @@ class CollectorService : Service() {
 
     }
 
+
+    private fun jsoupWeiboArticle() {
+        try {
+            val map = HashMap<String, String>()
+            LogUtil.d(TAG, "current:${System.currentTimeMillis()}")
+            //FIXME 和currentTimeMillis有关，是否会过期待验证
+            map.put("Apache","2019607141922.4148.1557193686510")
+            map.put("ULV","1557193686590:2:2:2:2019607141922.4148.1557193686510:1557126737039")
+            map.put("TC-Page-G0", "c4376343b8c98031e29230e0923842a5|1557193685|1557193685")
+
+            //这3个不变
+            map.put("SINAGLOBAL","8447668177794.232.1557126736964")
+            map.put("SUB","_2AkMrk1F4f8NxqwJRmPoTy2nka4VzzQ_EieKdz6CjJRMxHRl-yj9jqlAatRB6ABN_lyXCaJZ9LTNCbDriTZc7K-eoCKcN")
+            map.put("SUBP","0033WrSXqPxfM72-Ws9jqgMF55529P9D9W5zN12sA.aziaowF8KXvfMS")
+            doc = Jsoup.connect(weibourl)
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36")
+                .cookies(map).get()
+
+            val scripts = doc.getElementsByTag("script")
+            for (script in scripts) {
+                val text = script.data()
+                if (text.startsWith("FM.view")) {
+                    val jsonStr = text.substring(8, text.lastIndexOf(")"))
+                    val asJsonObject = JsonParser().parse(jsonStr).asJsonObject
+                    if (asJsonObject.has("ns") &&
+                        asJsonObject.get("ns").asString == "pl.content.homeFeed.index") {
+                        doc.body().append(asJsonObject.get("html").asString)
+                    }
+                }
+            }
+
+            val divs = doc.getElementsByClass(weiboDivClass)
+            divs.reverse()
+            for (div in divs) {
+                var time = div.getElementsByClass("WB_from S_txt2")[0].child(0).attr("title")
+                val detail = div.getElementsByClass("WB_text W_f14")[0].textNodes()[0].text()
+                if (time.contains(TimeUtil.nowYMD)) {
+                    time = time.substring(11)
+                    val text = Sentence("$time weibo->$detail")
+                    analyses(text)
+                }
+            }
+
+        } catch (e: Exception) {
+            LogUtil.w(TAG, "jsoupWeiboArticle exception: " + e.message)
+        } catch (e: Error) {
+            // jsoup 的 Exception 类型都是 Error
+            LogUtil.w(TAG, "jsoupWeiboArticle error: " + e.message)
+        }
+
+    }
+
     private fun analyses(text: Sentence) {
         var normalInfo = true
         val care = important(text.value, CARE_REG)
@@ -175,40 +235,41 @@ class CollectorService : Service() {
                         val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock1!!)
                         val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(query[0].stock2!!)
 
-                        Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
-                        .DataBean, BuySellORM> { t1, t2 ->
-                            item.stock1 = t1.stockName
-                            item.stock1Price = t1.newPrice
-                            item.stock2 = t2.stockName
-                            item.stock2Price = t2.newPrice
-                            //计算收益
-                            val lastBuyPrice = query[0].stock1Price
-                            if (lastBuyPrice != null) {
-                                item.stock1Return = String.format(Locale.CHINA,
-                                    "%.2f",
-                                    (t1.newPrice!!.toFloat() - lastBuyPrice.toFloat())
-                                        / lastBuyPrice.toFloat() * 100) + "%"
+                        val subscribe = Observable.zip(subscribeOn1,subscribeOn2,
+                            BiFunction<StockResp.DataBean, StockResp
+                            .DataBean, BuySellORM> { t1, t2 ->
+                                item.stock1 = t1.stockName
+                                item.stock1Price = t1.newPrice
+                                item.stock2 = t2.stockName
+                                item.stock2Price = t2.newPrice
+                                //计算收益
+                                val lastBuyPrice = query[0].stock1Price
+                                if (lastBuyPrice != null) {
+                                    item.stock1Return = String.format(Locale.CHINA,
+                                        "%.2f",
+                                        (t1.newPrice!!.toFloat() - lastBuyPrice.toFloat())
+                                            / lastBuyPrice.toFloat() * 100) + "%"
+                                }
+                                val lastBuyPrice2 = query[0].stock2Price
+                                if (lastBuyPrice2 != null) {
+                                    item.stock2Return = String.format(Locale.CHINA,
+                                        "%.2f",
+                                        (t2.newPrice!!.toFloat() - lastBuyPrice2.toFloat())
+                                            / lastBuyPrice2.toFloat() * 100) + "%"
+                                }
+                                return@BiFunction item
+                            }).subscribe {
+                                //插入数据
+                                val x = "$blogTime************************卖出参考(${item
+                                    .category})************************"
+                                print(TYPE_SELL, x)
+                                print(TYPE_SELL, "************************" + item.stock1 + item.stock1Price +
+                                    "************************" + item.stock1Return)
+                                print(TYPE_SELL, "************************" + item.stock2 + item.stock2Price +
+                                    "************************" + item.stock2Return)
+                                print(TYPE_SELL, x)
+                                insertBuySell(item)
                             }
-                            val lastBuyPrice2 = query[0].stock2Price
-                            if (lastBuyPrice2 != null) {
-                                item.stock2Return = String.format(Locale.CHINA,
-                                    "%.2f",
-                                    (t2.newPrice!!.toFloat() - lastBuyPrice2.toFloat())
-                                        / lastBuyPrice2.toFloat() * 100) + "%"
-                            }
-                            return@BiFunction item
-                        }).subscribe {
-                            //插入数据
-                            val x = "$blogTime************************卖出参考(${item
-                                .category})************************"
-                            print(TYPE_SELL, x)
-                            print(TYPE_SELL, "************************" + item.stock1 + item.stock1Price +
-                                "************************" + item.stock1Return)
-                            print(TYPE_SELL, "************************" + item.stock2 + item.stock2Price +
-                                "************************" + item.stock2Return)
-                            print(TYPE_SELL, x)
-                            insertBuySell(item)
-                        }
                     } else {
                         //没找到之前记录 直接插入
                         val x = "$blogTime************************卖出参考null(${item
@@ -236,21 +297,21 @@ class CollectorService : Service() {
                     val subscribeOn1 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock1!!)
                     val subscribeOn2 = RetrofitSingleton.instance.fetchStockByNameCN(item.stock2!!)
 
-                    Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
-                    .DataBean, BuySellORM> { t1, t2 ->
-                        item.stock1Price = t1.newPrice
-                        item.stock2Price = t2.newPrice
-                        return@BiFunction item
-                    }).subscribe {
-                        val x = "$blogTime************************买入选择(${item.category})************************"
-                        print(TYPE_BUY, x)
-                        print(TYPE_BUY, "************************" + item.stock1 + item.stock1Price +
-                            "************************" + item.count1)
-                        print(TYPE_BUY, "************************" + item.stock2 + item.stock2Price +
-                            "************************" + item.count2)
-                        print(TYPE_BUY, x)
-                        insertBuySell(item)
-                    }
+                    val subscribe = Observable.zip(subscribeOn1, subscribeOn2, BiFunction<StockResp.DataBean, StockResp
+                        .DataBean, BuySellORM> { t1, t2 ->
+                            item.stock1Price = t1.newPrice
+                            item.stock2Price = t2.newPrice
+                            return@BiFunction item
+                        }).subscribe {
+                            val x = "$blogTime************************买入选择(${item.category})************************"
+                            print(TYPE_BUY, x)
+                            print(TYPE_BUY, "************************" + item.stock1 + item.stock1Price +
+                                "************************" + item.count1)
+                            print(TYPE_BUY, "************************" + item.stock2 + item.stock2Price +
+                                "************************" + item.count2)
+                            print(TYPE_BUY, x)
+                            insertBuySell(item)
+                        }
 
                 }
             }
@@ -280,6 +341,7 @@ class CollectorService : Service() {
     }
 
     private fun insertPosition(text: String) {
+        //TODO 2019-3-29 区分短/中长线账户仓位
         val important = important(text, SPACE_REG)
         val substring = important!!.substring(0, important.length - 1)
         val chars = substring.toCharArray()
@@ -311,6 +373,10 @@ class CollectorService : Service() {
             e.printStackTrace()
         }
 
+        sendMail(it)
+    }
+
+    private fun sendMail(it: BuySellORM) {
         Observable.create(ObservableOnSubscribe<Any> { emitter ->
             //发个邮件吧
             val cache = MailCacheORM(it.blogTime, it.category + it.desc, it.toString(), TimeUtil.nowYMDHMSTime)
@@ -375,11 +441,12 @@ class CollectorService : Service() {
                         " and LOG_TIME >='" + somedaysAgo + "'" + ")" +
                         " and LOG_TIME >='" + somedaysAgo + "'" +
                         " GROUP BY STOCK_NAME ORDER BY c DESC limit 2"
-                    LogUtil.d(TAG, "searchMaybeBought() sql = [$sql]")
+                    LogUtil.d(TAG, "searchMaybeBought() sql2 = [$sql]")
                     readableDatabase = OrmLite.getInstance().readableDatabase
                     cursor = readableDatabase.rawQuery(sql, null)
                 }
 
+                LogUtil.d(TAG, "searchMaybeBought() size = [${cursor.count}]")
                 var success = cursor.moveToNext()
                 if (success) {
                     val name = cursor.getString(0)
@@ -416,7 +483,7 @@ class CollectorService : Service() {
 
             val blogTime = StringUtil.getBlogTime(p)
             p = p.substring(p.indexOf(" ") + 1)
-            val cnNames = p.split("\\.".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+            val cnNames = p.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val list = ArrayList<CareORM>()
             val nowYMDHMSTime = TimeUtil.nowYMDHMSTime
             for (cnName in cnNames) {
@@ -509,12 +576,14 @@ class CollectorService : Service() {
     companion object {
         const val TITLE = "wu2198股市直播"
         const val url = "http://blog.sina.com.cn/u/1216826604"
+        const val weibourl = "https://www.weibo.com/wu2198?profile_ftype=1&is_all=1#_0"
+        const val weiboDivClass = "WB_detail"
         const val CONTENT_ID = "sina_keyword_ad_area2"
         val BUY_REG = arrayOf("买入.*%", "买.*%", "买进.*%", "增持.*%", "增仓.*%", "回补.*%", "加仓.*%", "接回.*%")
         val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "T掉.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%",
             "减掉" +
                 ".*%")
-        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "目前.?.?.?.?%", "现在.?.?.?.?%", "仓位是零", "仓位暂时是零")
+        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "仓位是零", "仓位暂时是零", "零仓位")
         val CARE_REG = arrayOf("领先.*股", "领先.*板", "等.*股继续领先", "冲涨停", "目前具有上涨", "目前涨停", "目前领先", "出现涨停", "改写了新高", "等领先")
 
         val collectDate = arrayOf<String>()

@@ -66,10 +66,10 @@ class SelfSelectStockFragment : BaseFragment() {
         // TODO: 2018/3/29 leaks here
         RxBus.default
             .toObservable(StockUpdateEvent::class.java)
-            .doOnNext({
+            .doOnNext {
                 notify = it.stock
                 multiLoad()
-            })
+            }
             .subscribe()
     }
 

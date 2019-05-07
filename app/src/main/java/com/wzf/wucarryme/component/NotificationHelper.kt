@@ -16,6 +16,9 @@ object NotificationHelper {
     private var NOTIFICATION_ID_ALERT = 2333
     private var NOTIFICATION_ID = 233
 
+    private val DO_NOTIFY = false
+
+
     //    public static void showWeatherNotification(Context context, @NonNull DataBean weather) {
     //        Intent intent = new Intent(context, MainActivity.class);
     //        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -33,6 +36,7 @@ object NotificationHelper {
     //    }
 
     fun showPositioningNotification(context: Context, buySell: BuySellORM) {
+        if(!DO_NOTIFY) return
         val intent = Intent(context, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -55,6 +59,7 @@ object NotificationHelper {
     }
 
     fun showCustomNotification(context: Context, bean: StockResp.DataBean) {
+        if(!DO_NOTIFY) return
         val intent = Intent(context, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)

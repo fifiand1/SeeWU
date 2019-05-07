@@ -67,14 +67,14 @@ class MainFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         // TODO: 2018/4/4 leaks here
         RxBus.default
-                .toObservable(ChangeCityEvent::class.java)
-                .observeOn(AndroidSchedulers.mainThread())
-                .filter({ isVisible })
-                .doOnNext({
-                    mRefreshLayout.isRefreshing = true
-                    load()
-                })
-                .subscribe()
+            .toObservable(ChangeCityEvent::class.java)
+            .observeOn(AndroidSchedulers.mainThread())
+            .filter { isVisible }
+            .doOnNext {
+                mRefreshLayout.isRefreshing = true
+                load()
+            }
+            .subscribe()
     }
 
     private fun initView() {

@@ -78,7 +78,9 @@ class PositionActivity : ToolbarActivity() {
         val entries = ArrayList<PieEntry>()
 
         //组装数据
-        val desc = it.desc
+        val desc = it.desc?.apply {
+//            safeSetTitle(this)
+        }
 //        val desc = "14:25 目前是50%仓位(5%券商.20%中药.25%化学制药)"
         val bracketPattern = Pattern.compile("(\\([^)]*\\))")
         val digitPattern = Pattern.compile("[^0-9]")
