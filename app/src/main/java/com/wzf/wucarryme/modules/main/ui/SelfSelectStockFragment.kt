@@ -111,7 +111,7 @@ class SelfSelectStockFragment : BaseFragment() {
         })
 
         ViewStyleHelper.setSwipeRefreshColor(mRefreshLayout)
-        mRefreshLayout.setOnRefreshListener({ this.multiLoad() })
+        mRefreshLayout.setOnRefreshListener { this.multiLoad() }
     }
 
     private fun multiLoad() {
@@ -140,7 +140,7 @@ class SelfSelectStockFragment : BaseFragment() {
                 LogUtil.i(TAG, Thread.currentThread().name + " onNext " + stocks)
                 mRefreshLayout.isRefreshing = false
                 if (stocks is ArrayList<*>) {
-                    val stocks1 = stocks as ArrayList<StockResp.DataBean>
+                    val stocks1 = stocks.filterIsInstance<StockResp.DataBean>()
                     if (mStocks!!.size == 0) {
                         mStocks!!.addAll(stocks1)
                     } else {

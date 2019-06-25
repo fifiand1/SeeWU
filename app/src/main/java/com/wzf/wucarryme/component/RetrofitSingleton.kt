@@ -51,7 +51,7 @@ class RetrofitSingleton private constructor() {
                         val stockName = it.stockName?.trim()
                         val other = SharedPreferenceUtil.instance.getString(
                             SharedPreferenceUtil.ALERT_STOCK_NAME + stockName, "")
-                        if (other != "") {
+                        if (other != "" && !it.newPrice!!.startsWith("0.")) {
                             val start = other.substring(0, 1)
                             val end = other.substring(1)
 

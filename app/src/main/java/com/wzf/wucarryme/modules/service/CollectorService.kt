@@ -84,7 +84,7 @@ class CollectorService : Service() {
                 }
             }
         }
-        return Service.START_REDELIVER_INTENT
+        return START_REDELIVER_INTENT
     }
 
     private fun jsoupTodayURL(): Boolean {
@@ -95,7 +95,12 @@ class CollectorService : Service() {
             val elementsByAttributeValue = doc.getElementsByAttributeValue("class", "blog_title")
             for (element in elementsByAttributeValue) {
                 val a = element.getElementsByTag("a")
-                val time = element.nextElementSibling().textNodes()[0].text()
+                var nextElementSibling = element.nextElementSibling()
+                while (nextElementSibling.tagName() != "span") {
+                    nextElementSibling = nextElementSibling.nextElementSibling()
+                }
+                val textNodes = nextElementSibling.textNodes()
+                val time = textNodes[0].text()
                 val element1 = a[0]
                 val title = element1.text()
                 //<span class="time SG_txtc">(2019-03-29 14:47)</span>
@@ -227,7 +232,7 @@ class CollectorService : Service() {
                     // TODO: 2018/5/9 仓位%暂时不管
                     //找出当时买的
                     val query = OrmLite.getInstance().query(QueryBuilder(BuySellORM::class.java)
-                        .where("CATEGORY_ = ? AND ACTION_ = ?", item.category, CollectorService.TYPE_BUY)
+                        .where("CATEGORY_ = ? AND ACTION_ = ?", item.category, TYPE_BUY)
                         .appendOrderDescBy("ID_").limit("1"))
 
                     if (query.size > 0 && query[0].stock1 != null) {
@@ -406,7 +411,8 @@ class CollectorService : Service() {
             bankuaiList.add(bankuai)
         }
         if (bankuaiList.size == 0) {
-            bankuaiList.add(s.substring(s.indexOf("%") + 1))
+            val startIndex = s.indexOf("%") + 1
+            bankuaiList.add(s.substring(startIndex, startIndex+2))
         }
         val blogTime = StringUtil.getBlogTime(s)
         val nowYMDHMSTime = TimeUtil.nowYMDHMSTime
@@ -583,7 +589,7 @@ class CollectorService : Service() {
         val SELL_REG = arrayOf("卖出.*%", "卖.*%", "兑现.*%", "T出.*%", "T掉.*%", "减仓.*%", "走了.*%", "走掉.*%", "砍掉.*%", "割掉.*%",
             "减掉" +
                 ".*%")
-        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.?.?.?.?%", "仓位是零", "仓位暂时是零", "零仓位")
+        val SPACE_REG = arrayOf("目前.*帐户.?.?.?.?%", ".*帐户.*%", "仓位是零", "仓位暂时是零", "零仓位")
         val CARE_REG = arrayOf("领先.*股", "领先.*板", "等.*股继续领先", "冲涨停", "目前具有上涨", "目前涨停", "目前领先", "出现涨停", "改写了新高", "等领先")
 
         val collectDate = arrayOf<String>()
