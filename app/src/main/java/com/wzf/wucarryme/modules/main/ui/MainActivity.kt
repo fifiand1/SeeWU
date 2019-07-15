@@ -52,6 +52,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         initDrawer()
         initIcon()
         //        startService(new Intent(this, AutoUpdateService.class));
+        /*
+        *  So to create foreground service you have to use NotificationManager.startServiceInForeground().
+        *  This method is equivalent to creating background service and
+        *  promoting it to the foreground service combine.
+        *  */
         startService(Intent(this, CollectorService::class.java))
     }
 
@@ -120,8 +125,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         SharedPreferenceUtil.instance.putInt("BUY", R.mipmap.ic_event_available_black_36dp)
         SharedPreferenceUtil.instance.putInt("SELL", R.mipmap.ic_event_busy_black_36dp)
         SharedPreferenceUtil.instance.putInt("POS", R.mipmap.ic_event_note_black_36dp)
-        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "创业板指", "<1446")
-        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "上证指数", "<2846")
+        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "创业板指", "<1490")
+        SharedPreferenceUtil.instance.putString(SharedPreferenceUtil.ALERT_STOCK_NAME + "上证指数", "<2890")
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

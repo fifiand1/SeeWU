@@ -1,7 +1,7 @@
 ext {
     android = [
         buildToolsVersion: '27.0.3',
-        minSdkVersion    : 19,
+        minSdkVersion    : 23,
         compileSdkVersion: 27,
         targetSdkVersion : 27,
         applicationId    : "com.wzf.wucarryme",

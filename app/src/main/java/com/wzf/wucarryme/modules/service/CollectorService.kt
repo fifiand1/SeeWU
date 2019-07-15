@@ -13,6 +13,7 @@ import com.wzf.wucarryme.common.utils.StringUtil.banKuai
 import com.wzf.wucarryme.common.utils.TimeUtil
 import com.wzf.wucarryme.component.MailHelper
 import com.wzf.wucarryme.component.NotificationHelper
+import com.wzf.wucarryme.component.NotificationHelper.showPositioningNotification
 import com.wzf.wucarryme.component.OrmLite
 import com.wzf.wucarryme.component.RetrofitSingleton
 import com.wzf.wucarryme.modules.care.domain.BuySellORM
@@ -84,7 +85,7 @@ class CollectorService : Service() {
                 }
             }
         }
-        return START_REDELIVER_INTENT
+        return START_STICKY
     }
 
     private fun jsoupTodayURL(): Boolean {
@@ -195,6 +196,7 @@ class CollectorService : Service() {
 
             val divs = doc.getElementsByClass(weiboDivClass)
             divs.reverse()
+            var detailNum = 0
             for (div in divs) {
                 var time = div.getElementsByClass("WB_from S_txt2")[0].child(0).attr("title")
                 val detail = div.getElementsByClass("WB_text W_f14")[0].textNodes()[0].text()
@@ -202,9 +204,11 @@ class CollectorService : Service() {
                     time = time.substring(11)
                     val text = Sentence("$time weibo->$detail")
                     analyses(text)
+                    detailNum++
                 }
             }
 
+            LogUtil.i(TAG, "jsoupWeiboArticle size -> $detailNum")
         } catch (e: Exception) {
             LogUtil.w(TAG, "jsoupWeiboArticle exception: " + e.message)
         } catch (e: Error) {

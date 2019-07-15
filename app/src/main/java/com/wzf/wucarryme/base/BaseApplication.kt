@@ -1,7 +1,6 @@
 package com.wzf.wucarryme.base
 
 import com.facebook.stetho.Stetho
-import com.github.moduth.blockcanary.BlockCanary
 import com.squareup.leakcanary.LeakCanary
 import com.wzf.wucarryme.BuildConfig
 import com.wzf.wucarryme.component.CrashHandler
@@ -25,7 +24,7 @@ class BaseApplication : Application() {
         } else {
             Stetho.initializeWithDefaults(this)
         }
-        BlockCanary.install(this, AppBlockCanaryContext()).start()
+//        BlockCanary.install(this, AppBlockCanaryContext()).start()
         LeakCanary.install(this)
         RxJavaPlugins.setErrorHandler { throwable ->
             throwable.printStackTrace()
